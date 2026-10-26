@@ -16,3 +16,11 @@ Thumbs.db
 
 # Original download (contents already unpacked into the repo)
 *.zip
+
+# Part 3 recordings and cached features (too large; not submitted)
+Part3/data/videos/
+Part3/features/
+*.mp4
+*.mov
+# ...but keep the compressed 480p copies (~40 MB) so the team can share them
+!Part3/data/videos_480p/**/*.mp4
