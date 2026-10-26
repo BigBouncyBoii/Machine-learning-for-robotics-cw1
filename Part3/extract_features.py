@@ -18,7 +18,7 @@
 #   patch      (n_clips, N_FRAMES, 384)  mean of the patch tokens of each sampled frame
 #   frame_idx  (n_clips, N_FRAMES)       which frame of the clip was sampled
 #   n_total    (n_clips,)                frames in the clip
-#   file, person, object, label  (n_clips,)  copied from labels.csv
+#   clip, person, object, label  (n_clips,)  copied from labels.csv (clip = the 'file' column)
 
 # %% Settings
 import time
@@ -106,7 +106,7 @@ for i, path in enumerate(df["video"]):
 OUT.parent.mkdir(exist_ok=True)
 np.savez_compressed(
     OUT, cls=cls, patch=patch, frame_idx=frame_idx, n_total=n_total,
-    file=df["file"].values, person=df["person"].values,
-    object=df["object"].values, label=df["label"].values,
+    clip=np.asarray(df["file"], dtype=str), person=np.asarray(df["person"], dtype=str),
+    object=np.asarray(df["object"], dtype=str), label=np.asarray(df["label"], dtype=str),
 )
 print(f"saved {OUT}  cls {cls.shape}  patch {patch.shape}")
