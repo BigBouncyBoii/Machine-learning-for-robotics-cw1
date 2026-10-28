@@ -1,5 +1,5 @@
 test_person,input,model,val_acc,test_acc,ci_low,ci_high,p_value,hard_acc,soft_acc,auc,correct,n_test
-A,nail + mid a* curve,MLP,0.5917,0.6250,0.4703,0.7578,0.0769,0.6500,0.6000,0.8050,25,40
-B,nail + mid a* curve,logistic regression,0.6750,0.6000,0.4460,0.7365,0.1341,0.5500,0.6500,0.6850,24,40
-C,"all regions, all Lab, all bins",logistic regression,0.6583,0.4750,0.3294,0.6250,0.6821,0.3000,0.6500,0.5075,19,40
-D,nail + mid a* curve,MLP,0.6083,0.6250,0.4703,0.7578,0.0769,0.7500,0.5000,0.6987,25,40
+A,nail + mid a* curve,"MLP x10, alpha 10",0.5167,0.7250,0.5717,0.8389,0.0032,0.7000,0.7500,0.8675,29,40
+B,nail + mid Lab curves,"MLP x10, alpha 10",0.6500,0.5000,0.3520,0.6480,0.5627,0.4500,0.5500,0.5525,20,40
+C,nail + mid Lab curves,"MLP x10, alpha 10",0.6417,0.5750,0.4220,0.7149,0.2148,0.3500,0.8000,0.6775,23,40
+D,nail + mid a* curve,"MLP x10, alpha 10",0.6083,0.7250,0.5717,0.8389,0.0032,0.7500,0.7000,0.7363,29,40

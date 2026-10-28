@@ -71,7 +71,8 @@ for r in results:
 per_case = pd.DataFrame(rows)
 gap = (per_case["val_acc"] - per_case["test_acc"]).mean()
 out(f"mean validation {100 * per_case['val_acc'].mean():.1f} %, mean test {100 * per_case['test_acc'].mean():.1f} %"
-    f" (validation is {100 * gap:+.1f} points above test: the optimism of choosing on validation)")
+    + (f" (validation is {100 * gap:.1f} points above test: the optimism of choosing on validation)" if gap > 0
+       else f" (test is {-100 * gap:.1f} points above validation: no sign of optimism from choosing on validation)"))
 
 # %% Pooled
 n, k = len(pred), int(pred["correct"].sum())

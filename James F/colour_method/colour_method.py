@@ -29,6 +29,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
@@ -240,6 +241,11 @@ def make_model(kind):
                          MODELS[kind]())
 
 
+def fit_predict(kind, X_tr, y_tr, X_va):
+    """Train one model on the training grips and return P(firm) for the validation grips."""
+    return make_model(kind).fit(X_tr, y_tr).predict_proba(X_va)[:, 1]
+
+
 # %% Grip figures
 def middle_frame(path, lm):
     """RGB frame nearest the middle of the clip where the hand was found (or the middle frame), and its index."""
@@ -315,16 +321,22 @@ def run(test_person, show=True, grip_images=True):
     print("Leave-one-person-out validation (guessing = 50 % accuracy, log loss 0.693)")
     print(f"{'input':<32}{'model':<22}" + "".join(f"{'val ' + p:>8}" for p in people) + f"{'mean':>8}"
           + f"{'logloss':>9}")
+    # All (input, model, validation person) fits are independent, so they run in parallel on every CPU core.
+    # Each fit uses fixed seeds, so the numbers are the same as running them one after another.
+    jobs = [(name, kind, p) for name in INPUTS for kind in MODELS for p in people]
+    folds = {p: (is_train & (df["person"] != p).values, is_train & (df["person"] == p).values) for p in people}
+    probs = Parallel(n_jobs=-1)(
+        delayed(fit_predict)(kind, INPUTS[name][folds[p][0]], y[folds[p][0]], INPUTS[name][folds[p][1]])
+        for name, kind, p in jobs)
+    prob_of = dict(zip(jobs, probs))
     val_results, val_loss = {}, {}
-    for name, X in INPUTS.items():
+    for name in INPUTS:
         for kind in MODELS:
             acc, loss = [], []
             for p in people:
-                tr = is_train & (df["person"] != p).values
-                va = is_train & (df["person"] == p).values
-                prob = make_model(kind).fit(X[tr], y[tr]).predict_proba(X[va])[:, 1]
-                acc.append(((prob > 0.5) == y[va]).mean())
-                loss.append(log_loss(y[va], prob, labels=[0, 1]))
+                prob, y_va = prob_of[(name, kind, p)], y[folds[p][1]]
+                acc.append(((prob > 0.5) == y_va).mean())
+                loss.append(log_loss(y_va, prob, labels=[0, 1]))
             val_results[(name, kind)] = np.mean(acc)
             val_loss[(name, kind)] = np.mean(loss)
             print(f"{name:<32}{kind:<22}" + "".join(f"{100 * v:>7.0f}%" for v in acc)
