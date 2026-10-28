@@ -4,10 +4,12 @@
 #   Finger patches   MediaPipe landmarks -> 10 discs per frame: nail and middle segment of each finger
 #   Patch colour     per frame: CIELAB of the skin pixels in each disc, relative to the white wall
 #   Clip curves      run on every clip once and cache colours (and landmarks) per frame
-#   Network input    per grip: colour change from rest, averaged into time bins -> one vector per grip
+#   Network input    per grip: colour change from rest, averaged into time bins -> one vector per grip;
+#                    classifier = ensemble of 10 MLPs (EnsembleMLP), logistic regression as a baseline
 #   Grip figures     one input -> output image per grip: frame with patches, colour curves, firm probability
 #   Run one case     run(test_person): validation on the other three people (leave-one-person-out),
-#                    choose input + model, train on all three, test once on test_person, save one image
+#                    choose input + MLP penalty by validation log loss, train on all three,
+#                    test once on test_person, save one image
 #                    per test grip in figures/test_<person>/ and the validation bar chart
 #   AI use           Claude Opus 5.5 (claude-opus-5-5), default setting
 #
@@ -27,8 +29,10 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import log_loss
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -61,7 +65,8 @@ PATCH_RADIUS = 0.45          # disc radius as a fraction of the segment length
 N_BINS = 10                  # each clip is cut into 10 equal time bins (clips are 2.5-3.5 s)
 REST_BINS = 2                # first 2 bins = hand reaching in, before the grip: the reference colour
 MLP_HIDDEN = (16,)           # one hidden layer of 16 neurons
-MLP_ALPHA = 1.0              # strong L2 penalty: ~80 training grips per fold, so overfitting is the risk
+MLP_ALPHAS = [0.3, 1.0, 3.0, 10.0]   # L2 penalties tried on validation (~80 training grips: overfitting is the risk)
+N_ENSEMBLE = 10              # each MLP is really 10 MLPs with different starting weights, probabilities averaged
 
 # nanmean over a patch/bin where MediaPipe never found the hand gives NaN (wanted; the imputer fills it)
 warnings.filterwarnings("ignore", "Mean of empty slice", RuntimeWarning)
@@ -200,11 +205,33 @@ INPUTS = {
     "all regions, all Lab, all bins": curves.reshape(len(df), -1),
 }
 
-MODELS = {
-    "MLP": lambda: MLPClassifier(hidden_layer_sizes=MLP_HIDDEN, alpha=MLP_ALPHA, max_iter=3000,
-                                 random_state=SEED),
-    "logistic regression": lambda: LogisticRegression(C=1.0, max_iter=2000, random_state=SEED),
-}
+class EnsembleMLP(ClassifierMixin, BaseEstimator):
+    """N_ENSEMBLE small MLPs that differ only in their random starting weights; predictions are averaged.
+
+    With ~80 training grips one MLP depends a lot on where it starts; averaging removes that luck.
+    lbfgs (full-batch quasi-Newton) is the usual solver for small data sets: it converges properly.
+    """
+
+    def __init__(self, alpha=1.0, n_members=N_ENSEMBLE, hidden=MLP_HIDDEN):
+        self.alpha, self.n_members, self.hidden = alpha, n_members, hidden
+
+    def fit(self, X, y):
+        self.members_ = [MLPClassifier(hidden_layer_sizes=self.hidden, alpha=self.alpha, solver="lbfgs",
+                                       max_iter=2000, random_state=SEED + s).fit(X, y)
+                         for s in range(self.n_members)]
+        self.classes_ = self.members_[0].classes_
+        return self
+
+    def predict_proba(self, X):
+        return np.mean([m.predict_proba(X) for m in self.members_], axis=0)
+
+    def predict(self, X):
+        return self.classes_[self.predict_proba(X).argmax(1)]
+
+
+MODELS = {f"MLP x{N_ENSEMBLE}, alpha {al:g}": (lambda al=al: EnsembleMLP(alpha=al)) for al in MLP_ALPHAS}
+MODELS["logistic regression"] = lambda: LogisticRegression(C=1.0, max_iter=2000, random_state=SEED)
+SELECTABLE = [k for k in MODELS if k.startswith("MLP")]   # logistic regression is only a baseline
 
 
 def make_model(kind):
@@ -283,22 +310,28 @@ def run(test_person, show=True, grip_images=True):
           f"{100 * found[~is_train].mean():.0f} % (test clips)\n")
 
     # Validation: leave-one-person-out inside the three training people; the test person is never touched.
-    print("Leave-one-person-out validation accuracy (guessing = 50 %)")
-    print(f"{'input':<32}{'model':<21}" + "".join(f"{'val ' + p:>8}" for p in people) + f"{'mean':>8}")
-    val_results = {}
+    # Choice is by mean validation log loss: accuracy on 40 grips moves in 2.5 % steps and is noisy,
+    # log loss also uses how confident each prediction was (lower = better, 0.693 = always saying 50 %).
+    print("Leave-one-person-out validation (guessing = 50 % accuracy, log loss 0.693)")
+    print(f"{'input':<32}{'model':<22}" + "".join(f"{'val ' + p:>8}" for p in people) + f"{'mean':>8}"
+          + f"{'logloss':>9}")
+    val_results, val_loss = {}, {}
     for name, X in INPUTS.items():
         for kind in MODELS:
-            acc = []
+            acc, loss = [], []
             for p in people:
                 tr = is_train & (df["person"] != p).values
                 va = is_train & (df["person"] == p).values
-                acc.append((make_model(kind).fit(X[tr], y[tr]).predict(X[va]) == y[va]).mean())
+                prob = make_model(kind).fit(X[tr], y[tr]).predict_proba(X[va])[:, 1]
+                acc.append(((prob > 0.5) == y[va]).mean())
+                loss.append(log_loss(y[va], prob, labels=[0, 1]))
             val_results[(name, kind)] = np.mean(acc)
-            print(f"{name:<32}{kind:<21}" + "".join(f"{100 * v:>7.0f}%" for v in acc)
-                  + f"{100 * np.mean(acc):>7.0f}%")
+            val_loss[(name, kind)] = np.mean(loss)
+            print(f"{name:<32}{kind:<22}" + "".join(f"{100 * v:>7.0f}%" for v in acc)
+                  + f"{100 * np.mean(acc):>7.0f}%{np.mean(loss):>9.3f}")
 
     # Test: train the chosen version on all three training people, evaluate once on test_person.
-    best_input, best_model = max(val_results, key=val_results.get)   # chosen on validation only
+    best_input, best_model = min([k for k in val_loss if k[1] in SELECTABLE], key=val_loss.get)   # validation only
     X = INPUTS[best_input]
     model = make_model(best_model).fit(X[is_train], y[is_train])
     p_firm = model.predict_proba(X)[:, 1]
@@ -306,7 +339,7 @@ def run(test_person, show=True, grip_images=True):
     test_acc = correct[~is_train].mean()
     n_test = (~is_train).sum()
     print(f"\nchosen on validation: '{best_input}' + {best_model} "
-          f"(val {100 * val_results[(best_input, best_model)]:.0f} %)")
+          f"(val {100 * val_results[(best_input, best_model)]:.0f} %, log loss {val_loss[(best_input, best_model)]:.3f})")
     print(f"test person {test_person}: {100 * test_acc:.1f} % ({correct[~is_train].sum()}/{n_test}), "
           f"guessing = 50 %")
     per_object = {}
@@ -324,11 +357,12 @@ def run(test_person, show=True, grip_images=True):
             plot_grip(k, p_firm[k], is_train, best_model, test_person, grip_dir)
         print(f"{n_test} grip images saved in {grip_dir}")
 
-    fig, ax = plt.subplots(figsize=(9, 4))
+    fig, ax = plt.subplots(figsize=(10, 4))
     names = list(INPUTS)
+    w = 0.8 / len(MODELS)
     for j, kind in enumerate(MODELS):
-        ax.bar(np.arange(len(names)) + (j - 0.5) * 0.38, [100 * val_results[(n, kind)] for n in names],
-               width=0.38, label=kind)
+        ax.bar(np.arange(len(names)) + (j - (len(MODELS) - 1) / 2) * w, [100 * val_results[(n, kind)] for n in names],
+               width=w, label=kind)
     ax.axhline(50, color="k", ls="--", lw=1, label="guessing")
     ax.set_xticks(np.arange(len(names)), names, fontsize=8)
     ax.set_ylabel("validation accuracy (%)")

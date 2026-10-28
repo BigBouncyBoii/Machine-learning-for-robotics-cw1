@@ -54,7 +54,7 @@ out("PERFORMANCE OF THE COLOUR METHOD (MediaPipe finger patches -> colour change
 out("Each case: one person is the test set; input and model are chosen by leave-one-person-out validation")
 out("on the other three people only, then trained on those three and tested once.")
 out()
-out(f"{'test':<6}{'chosen input':<32}{'model':<21}{'val':>6}{'test':>7}{'95% CI':>14}{'p':>8}"
+out(f"{'test':<6}{'chosen input':<32}{'model':<24}{'val':>6}{'test':>7}{'95% CI':>14}{'p':>8}"
     f"{'hard':>7}{'soft':>7}{'AUC':>7}")
 rows = []
 for r in results:
@@ -65,7 +65,7 @@ for r in results:
                  "val_acc": r["val_acc"], "test_acc": acc, "ci_low": lo, "ci_high": hi, "p_value": pval,
                  "hard_acc": r["hard"], "soft_acc": r["soft"], "auc": auc,
                  "correct": r["test_correct"], "n_test": r["n_test"]})
-    out(f"{r['test_person']:<6}{r['input']:<32}{r['model']:<21}{100 * r['val_acc']:>5.0f}%{100 * acc:>6.1f}%"
+    out(f"{r['test_person']:<6}{r['input']:<32}{r['model']:<24}{100 * r['val_acc']:>5.0f}%{100 * acc:>6.1f}%"
         f"{f'{100 * lo:.0f}-{100 * hi:.0f}%':>14}{pval:>8.3f}{100 * r['hard']:>6.0f}%{100 * r['soft']:>6.0f}%"
         f"{auc:>7.2f}")
 per_case = pd.DataFrame(rows)

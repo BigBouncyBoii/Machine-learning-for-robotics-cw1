@@ -1,0 +1,51 @@
+PERFORMANCE OF THE COLOUR METHOD (MediaPipe finger patches -> colour change over time -> classifier)
+Each case: one person is the test set; input and model are chosen by leave-one-person-out validation
+on the other three people only, then trained on those three and tested once.
+
+test  chosen input                    model                   val   test        95% CI       p   hard   soft    AUC
+A     nail + mid a* curve             MLP                     59%  62.5%        47-76%   0.077    65%    60%   0.80
+B     nail + mid a* curve             logistic regression     68%  60.0%        45-74%   0.134    55%    65%   0.69
+C     all regions, all Lab, all bins  logistic regression     66%  47.5%        33-63%   0.682    30%    65%   0.51
+D     nail + mid a* curve             MLP                     61%  62.5%        47-76%   0.077    75%    50%   0.70
+mean validation 63.3 %, mean test 58.1 % (validation is +5.2 points above test: the optimism of choosing on validation)
+
+POOLED OVER ALL 160 TEST GRIPS (each grip predicted by the model that never saw its person)
+  accuracy           58.1 % (93/160), 95 % CI 50.4-65.5 %
+  vs guessing (50 %) one-sided binomial p = 0.0239  -> better than guessing at the 5 % level
+  balanced accuracy  58.1 %
+  ROC AUC            0.618  (0.5 = guessing, 1 = perfect ranking of firm above light)
+  Brier score        0.292  (0.25 = always saying 50 %)
+
+  confusion matrix          predicted light   predicted firm
+    true light ( 80)               49               31
+    true firm  ( 80)               36               44
+
+  class     precision   recall     F1  grips
+  light         57.6%    61.3%   0.59     80
+  firm          58.7%    55.0%   0.57     80
+
+BREAKDOWNS (pooled test grips)
+  by object
+    hard                          56.2% (45/80), CI 45-67%, p = 0.157
+    soft                          60.0% (48/80), CI 49-70%, p = 0.046
+  by true label
+    firm                          55.0% (44/80), CI 44-65%, p = 0.217
+    light                         61.3% (49/80), CI 50-71%, p = 0.028
+  by object and label
+    hard firm                     55.0% (22/40), CI 40-69%, p = 0.318
+    hard light                    57.5% (23/40), CI 42-71%, p = 0.215
+    soft firm                     55.0% (22/40), CI 40-69%, p = 0.318
+    soft light                    65.0% (26/40), CI 50-78%, p = 0.040
+  by hand tracking (median 79 % of frames)
+    hand found in >= 79 % of frames  65.0% (52/80), CI 54-75%, p = 0.005
+    hand found in <  79 % of frames  51.2% (41/80), CI 40-62%, p = 0.456
+
+  most confident mistakes (look at these in figures/test_<person>/)
+    C_soft_light_07    true light  P(firm) = 1.00  hand found 46 %
+    C_soft_firm_03     true firm   P(firm) = 0.00  hand found 26 %
+    C_hard_firm_08     true firm   P(firm) = 0.00  hand found 100 %
+    C_hard_light_04    true light  P(firm) = 1.00  hand found 100 %
+    C_soft_light_05    true light  P(firm) = 1.00  hand found 74 %
+    C_hard_light_09    true light  P(firm) = 0.99  hand found 91 %
+    C_soft_firm_04     true firm   P(firm) = 0.01  hand found 52 %
+    A_soft_firm_08     true firm   P(firm) = 0.01  hand found 75 %
