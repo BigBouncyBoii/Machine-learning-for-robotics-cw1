@@ -35,46 +35,76 @@ Commit `Part3/data/labels.csv` (`file, person, object, label`) so everyone works
 
 ## 2. Test set (fix this BEFORE exploring, then don't touch it)
 
-- Put ~25% aside. **Proposal:** hold out **all recordings of one member** (with 4 members this is 25%). It is a clean split and also tests whether the method works on a new person.
-  - Alternative: 25% of each person × object × label, chosen with a fixed seed.
+- Put 25% aside (75/25, as the brief asks). **Decision:** part of every member's recordings, drawn at random with a fixed seed (`make_split.py`, seed 42). Each person × object × label group gives 2 or 3 of its 10 clips, arranged so that every person (10), object (20) and label (20) has exactly 25% in test. This gives 120 train / 40 test, with test balanced 20 light / 20 firm.
+  - Rejected alternative: hold out all recordings of one member (25%). It tests generalisation to a new person, but costs a quarter of the training data. Leave-one-person-out validation (below) still measures that.
 - Save the split to `Part3/data/split.csv` and commit it. That file is the record of which recordings are in the test set (the report must say this).
 - Whole grips only: all frames of one clip go to the same set.
 - Nothing is fit on the test set: no classifier weights, no thresholds, no feature normalisation / scaler.
-- Validation on the remaining people: **leave-one-person-out** (train on 2, validate on 1, rotate). The tree reports the mean validation accuracy.
+- Validation on the 120 train clips: **leave-one-person-out** (train on 3 people, validate on the 4th, rotate). The tree reports the mean validation accuracy.
 
 ## 3. Pipeline / code
 
+```
+Part3/
+├─ plan.md, report.md
+├─ data/
+│  ├─ labels.csv            file, person, object, label (one row per grip)
+│  ├─ split.csv             + set: train / test (fixed, committed)
+│  └─ videos_480p/A..D/     480p copies of the clips
+├─ features/                cached encoder outputs, one .npz per encoder (git-ignored)
+│  ├─ dinov2_small.npz
+│  └─ videomae_base.npz
+├─ encoders/                one file per frozen pretrained encoder
+│  ├─ dinov2.py             image encoder: each frame on its own
+│  └─ videomae.py           video encoder: the 16 frames together
+├─ common.py                shared paths, frame sampling, feature versions (FEATURES), loading
+├─ make_split.py            makes data/split.csv (run once)
+├─ extract_features.py      python extract_features.py dinov2 | videomae
+├─ explore.py               python explore.py <feature version>  -> one tree node's validation accuracy
+├─ predict_clip.py          demo: classify one video from the raw file
+└─ FinalMethod.py           required deliverable: final method on the test set
+```
+
 | File | Does |
 |------|------|
-| `make_sheet.py` | Generates the random light/firm order sheet for each person and object |
-| `extract_features.py` | Video → sampled frames → encoder → saves `features/<model>.npz` (one vector per frame per grip) |
-| `explore.py` | Loads cached features, runs one tree attempt, prints validation accuracy |
-| `FinalMethod.py` | **Required deliverable.** Trains the chosen method on train+val, runs it on the test set, prints accuracy vs 50% guessing |
+| `make_split.py` | Random 25% of every member's clips → test (fixed seed), written to `data/split.csv` |
+| `extract_features.py` | Video → 16 evenly spaced frames → frozen encoder → `features/<encoder>.npz`. Run once per encoder |
+| `common.py` | `FEATURES`: every feature version the tree compares (encoder + how it is pooled to one vector per clip). A pooling-only node is one new line here |
+| `explore.py` | Loads one feature version, leave-one-person-out validation of LR and MLP on the train clips, prints validation accuracy |
+| `predict_clip.py` | Trains on cached train features, then classifies any video path from scratch (same sampling/encoder code) |
+| `FinalMethod.py` | **Required deliverable.** Trains the chosen method on all train clips, runs it on the test set, prints accuracy vs 50% guessing |
 
 Every file starts with a code map, and its last line names the AI model used (see `Part2/Task2.py`).
 
-**Encoder candidates** (all run on CPU):
-- DINOv2 ViT-S/14: general image features, good on fine detail (finger/skin deformation)
-- CLIP ViT-B/32: alternative image features
-- VideoMAE / X-CLIP: a true video encoder, which may capture the squeeze motion
+**Encoders** (all frozen, run on CPU):
 
-**Classifier:** start with logistic regression (the baseline), then a small MLP (e.g. 1 hidden layer of 64, dropout, early stopping on validation). With about 120 training grips, the MLP may overfit. If it does, that is a valid tree result.
+| Encoder | Type | What it sees | Output per clip | Status |
+|---------|------|--------------|-----------------|--------|
+| DINOv2 ViT-S/14 (`facebook/dinov2-small`) | Image | Each of the 16 frames on its own (whole frame resized to 224×392) | 16 × 384 (CLS) and 16 × 384 (patch mean); pooled later | Extracted, baseline done |
+| VideoMAE ViT-B (`MCG-NJU/videomae-base-finetuned-kinetics`) | Video | All 16 frames together, in order (centre 480×480 square → 224×224) | 768 (clip vector) and 8 × 768 (one per 2-frame time step) | Extracted, LR val 65.8% / MLP 57.8% |
+| X-CLIP (`microsoft/xclip-base-patch32`) | Video + text | 8 frames together | Video vector, or zero-shot: compare with "a hand gripping firmly" vs "holding lightly" | Candidate |
 
-Extra packages needed (add to `requirements.txt` when we start): `torch`, `transformers` (or `timm`), `opencv-python`, `scikit-learn`.
+**Why VideoMAE next.** DINOv2 encodes every frame on its own, and averaging the 16 frame vectors throws away their order, so the classifier cannot see the squeeze happen. VideoMAE was trained to fill in hidden parts of videos, so its tokens (2 frames × 16 × 16 pixels) describe motion as well as appearance. If VideoMAE beats DINOv2 on the same split, folds and classifiers, the motion of the squeeze carries signal. If not, a single frame already holds what can be seen. Risk: 768 numbers from 120 clips overfits more than DINOv2's 384, so the LR baseline (strong L2) matters as much as the MLP.
+
+**Classifier:** start with logistic regression (the baseline), then a small MLP (1 hidden layer of 64, L2 penalty). With 120 training grips, the MLP may overfit. If it does, that is a valid tree result.
 
 ## 4. Exploration tree (plan, which will change with results)
 
-At least 5 and at most about 15 nodes, at least one per member, each with **why / val result / decision / initials**.
+At least 5 and at most about 15 nodes, at least one per member, each with **why / val result / decision / initials**. Every number is a mean leave-one-person-out validation accuracy on the 120 train clips (guessing = 50%).
 
 ```
 Question: can video tell a light grip from a firm grip?
-├─ Middle frame → DINOv2 → logistic regression (??): simplest baseline
-├─ Mean of all frame vectors → LR (??): does the whole clip help?
-│  └─ Same features → MLP (??): does a nonlinear head help?
-├─ Squeeze-frame vector minus rest-frame vector (??): firm grip = bigger visual change?
-├─ Crop to the hand (MediaPipe Hands) before encoding (??): does background hurt?
-├─ Video encoder (VideoMAE) instead of image encoder (??): does motion matter?
-└─ One model per object vs pooled (??): does the soft object carry all the signal?
+├─ DINOv2, image encoder (frozen)
+│  ├─ Middle frame → LR (??): simplest baseline
+│  ├─ Mean of 16 frames' CLS → LR (JL): does the whole clip help? val 62.5%
+│  │  └─ Same features → MLP (JL): does a nonlinear head help? val 63.8% (train 100%: overfits) → kept as baseline
+│  ├─ Patch mean instead of CLS (??): does local detail beat the global summary?
+│  ├─ Squeeze frame − rest frame (??): firm grip = bigger visual change?
+│  └─ Crop to the hand (MediaPipe Hands) (??): does background hurt?
+├─ VideoMAE, video encoder (JL): does the motion of the squeeze matter? LR val 65.8%, MLP 57.8% (train 100%) → LR slightly above DINOv2, within noise
+├─ X-CLIP zero-shot (??): does a video-language model already know grip force?
+├─ One model per object (??): soft object val ~0.75 vs hard ~0.5, does the soft object carry the signal?
+└─ Combine the best branches (all): do they make different mistakes? (weights/threshold chosen on validation only)
 Final method on the test set: ??%
 ```
 

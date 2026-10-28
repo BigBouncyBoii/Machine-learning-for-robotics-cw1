@@ -2,3 +2,7 @@ numpy
 pandas
 matplotlib
 pillow
+torch
+transformers
+opencv-python-headless
+scikit-learn
