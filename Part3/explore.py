@@ -1,57 +1,45 @@
 # CODE MAP of explore.py
-#   Settings       feature file, MLP size and regularisation, seeds
-#   Load           cached DINOv2 features + data/split.csv; keep TRAIN clips only (test clips are never used)
-#   Pool           16 frame vectors per clip -> 1 vector per clip (mean over frames of the CLS token)
+#   Settings       which feature version (command-line argument, see common.FEATURES)
+#   Load           cached features + data/split.csv; keep TRAIN clips only (test clips are never used)
 #   Validate       leave-one-person-out over the train people: train on the others, score on the left-out one
 #                  scaler and classifier are fitted inside each fold, on that fold's training clips only
-#   Models         logistic regression (baseline) and a 1-hidden-layer MLP
+#   Models         logistic regression (baseline) and a 1-hidden-layer MLP, from common.CLASSIFIERS
 #   Report         validation accuracy per left-out person and object, mean, vs 50% guessing
 #   AI use         Claude Opus 5.5 (claude-opus-5-5), default setting
 #
-# Tree node: "mean of all frame vectors -> MLP"
+# One run = one tree node. The number for the tree is the mean validation accuracy, never the train accuracy.
 #
-# HOW TO RUN (from the Part3 folder, after extract_features.py and make_split.py)
-#   pip install scikit-learn
-#   python explore.py
+# HOW TO RUN (from the Part3 folder, venv activated, after extract_features.py and make_split.py)
+#   python explore.py                      # default: dinov2_cls_mean
+#   python explore.py videomae             # any name in common.FEATURES
 
 # %% Settings
+import argparse
 import warnings
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.linear_model import LogisticRegression
-from sklearn.neural_network import MLPClassifier
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
 
-HERE = Path(__file__).resolve().parent
-FEATURES = HERE / "features" / "dinov2_small.npz"
-SPLIT = HERE / "data" / "split.csv"
+from common import CLASSIFIERS, FEATURES, SEEDS, load_features
 
-HIDDEN = (64,)        # one hidden layer of 64 ReLU units
-ALPHA = 1e-2          # L2 weight penalty: ~96 training clips per fold, so the MLP overfits easily
-MAX_ITER = 500
-SEEDS = range(5)      # MLP result depends on the random initial weights, so average over 5 seeds
+parser = argparse.ArgumentParser()
+parser.add_argument("features", nargs="?", default="dinov2_cls_mean", choices=FEATURES)
+NAME = parser.parse_args().features
 
+# classifier settings are in common.CLASSIFIERS (shared with FinalMethod.py)
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 # %% Load
-feat = np.load(FEATURES)
-split = pd.read_csv(SPLIT).set_index("file")
-clip_set = split.loc[feat["clip"], "set"].values      # match by file name, not by row order
-train = clip_set == "train"
-
-F = feat["cls"][train]                    # (n_train, 16, 384)
-person = feat["person"][train]
-obj = feat["object"][train]
-y = (feat["label"][train] == "firm").astype(int)   # 1 = firm, 0 = light
+X_all, meta = load_features(NAME)
+train = (meta["set"] == "train").values
+X = X_all[train]
+person = meta["person"].values[train]
+obj = meta["object"].values[train]
+y = (meta["label"].values[train] == "firm").astype(int)   # 1 = firm, 0 = light
+print(f"features: {NAME}  {X.shape[1]}-dim")
 print(f"train clips: {train.sum()}  people: {', '.join(sorted(set(person)))}  "
       f"({(~train).sum()} test clips are not used here)")
-
-# %% Pool
-X = F.mean(axis=1)                        # (n_train, 384): average the 16 frames of each clip
 
 
 # %% Validate
@@ -68,29 +56,19 @@ def leave_one_person_out(make_model):
     return pd.DataFrame(rows).set_index("left out")
 
 
-# %% Models
-def logreg():
-    return make_pipeline(StandardScaler(), LogisticRegression(C=0.1, max_iter=2000))
-
-
-def mlp(seed):
-    return make_pipeline(StandardScaler(), MLPClassifier(
-        hidden_layer_sizes=HIDDEN, alpha=ALPHA, max_iter=MAX_ITER, random_state=seed))
-
-
 # %% Report
 pd.set_option("display.float_format", "{:.2f}".format)
 
-lr = leave_one_person_out(logreg)
+lr = leave_one_person_out(lambda: CLASSIFIERS["lr"](0))
 print("\nLogistic regression (baseline), leave-one-person-out")
 print(lr)
 
-runs = [leave_one_person_out(lambda s=s: mlp(s)) for s in SEEDS]
+runs = [leave_one_person_out(lambda s=s: CLASSIFIERS["mlp"](s)) for s in SEEDS["mlp"]]
 mlp_mean = sum(runs) / len(runs)
 seed_accs = [r["all"].mean() for r in runs]
-print(f"\nMLP {HIDDEN}, alpha={ALPHA}, mean of {len(SEEDS)} seeds, leave-one-person-out")
+print(f"\nMLP (64,), mean of {len(runs)} seeds, leave-one-person-out")
 print(mlp_mean)
 
-print(f"\nMean validation accuracy (guessing = 0.50)")
+print(f"\nMean validation accuracy, {NAME} (guessing = 0.50)")
 print(f"  logistic regression : {lr['all'].mean():.3f}")
 print(f"  MLP                 : {np.mean(seed_accs):.3f}  (seeds range {min(seed_accs):.3f}-{max(seed_accs):.3f})")
