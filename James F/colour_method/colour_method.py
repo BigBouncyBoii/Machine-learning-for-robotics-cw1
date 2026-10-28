@@ -271,8 +271,9 @@ def plot_grip(k, p, is_train, model_name, test_person, out_dir):
 
 
 # %% Run one case
-def run(test_person, show=True):
-    """Hold out test_person, choose input + model on the other three, test once. Returns a result dict."""
+def run(test_person, show=True, grip_images=True):
+    """Hold out test_person, choose input + model on the other three, test once. Returns a result dict
+    (summary numbers, plus "pred": one row per test grip with its firm probability)."""
     y = df["y"].values
     is_train = (df["person"] != test_person).values
     people = [p for p in PEOPLE if p != test_person]
@@ -315,11 +316,13 @@ def run(test_person, show=True):
         print(f"  {obj} object: {100 * per_object[obj]:.0f} %")
 
     # Figures: one input -> output image per test grip, then the validation bars.
-    grip_dir = FIG_DIR / f"test_{test_person}"
-    grip_dir.mkdir(parents=True, exist_ok=True)
-    for k in np.flatnonzero(~is_train):
-        plot_grip(k, p_firm[k], is_train, best_model, test_person, grip_dir)
-    print(f"{n_test} grip images saved in {grip_dir}")
+    FIG_DIR.mkdir(exist_ok=True)
+    if grip_images:
+        grip_dir = FIG_DIR / f"test_{test_person}"
+        grip_dir.mkdir(parents=True, exist_ok=True)
+        for k in np.flatnonzero(~is_train):
+            plot_grip(k, p_firm[k], is_train, best_model, test_person, grip_dir)
+        print(f"{n_test} grip images saved in {grip_dir}")
 
     fig, ax = plt.subplots(figsize=(9, 4))
     names = list(INPUTS)
@@ -339,6 +342,10 @@ def run(test_person, show=True):
     if show:
         plt.show()
 
+    pred = df.loc[~is_train, ["file", "person", "object", "label", "y"]].copy()
+    pred["p_firm"] = p_firm[~is_train]
+    pred["hand_found"] = found[~is_train]
     return {"test_person": test_person, "input": best_input, "model": best_model,
             "val_acc": val_results[(best_input, best_model)], "test_acc": test_acc,
-            "test_correct": int(correct[~is_train].sum()), "n_test": int(n_test), **per_object}
+            "test_correct": int(correct[~is_train].sum()), "n_test": int(n_test), **per_object,
+            "pred": pred}
