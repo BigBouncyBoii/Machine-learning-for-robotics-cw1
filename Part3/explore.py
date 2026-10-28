@@ -1,6 +1,6 @@
 # CODE MAP of explore.py
 #   Settings       feature file, MLP size and regularisation, seeds
-#   Load           cached DINOv2 features + data/split.csv; keep TRAIN clips only (the test person is never loaded)
+#   Load           cached DINOv2 features + data/split.csv; keep TRAIN clips only (test clips are never used)
 #   Pool           16 frame vectors per clip -> 1 vector per clip (mean over frames of the CLS token)
 #   Validate       leave-one-person-out over the train people: train on the others, score on the left-out one
 #                  scaler and classifier are fitted inside each fold, on that fold's training clips only
@@ -31,7 +31,7 @@ FEATURES = HERE / "features" / "dinov2_small.npz"
 SPLIT = HERE / "data" / "split.csv"
 
 HIDDEN = (64,)        # one hidden layer of 64 ReLU units
-ALPHA = 1e-2          # L2 weight penalty: ~90 training clips per fold, so the MLP overfits easily
+ALPHA = 1e-2          # L2 weight penalty: ~96 training clips per fold, so the MLP overfits easily
 MAX_ITER = 500
 SEEDS = range(5)      # MLP result depends on the random initial weights, so average over 5 seeds
 
@@ -48,7 +48,7 @@ person = feat["person"][train]
 obj = feat["object"][train]
 y = (feat["label"][train] == "firm").astype(int)   # 1 = firm, 0 = light
 print(f"train clips: {train.sum()}  people: {', '.join(sorted(set(person)))}  "
-      f"(test person {', '.join(sorted(set(feat['person'][~train])))} is not used here)")
+      f"({(~train).sum()} test clips are not used here)")
 
 # %% Pool
 X = F.mean(axis=1)                        # (n_train, 384): average the 16 frames of each clip

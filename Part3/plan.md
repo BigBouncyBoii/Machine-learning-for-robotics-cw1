@@ -35,12 +35,12 @@ Commit `Part3/data/labels.csv` (`file, person, object, label`) so everyone works
 
 ## 2. Test set (fix this BEFORE exploring, then don't touch it)
 
-- Put ~25% aside. **Proposal:** hold out **all recordings of one member** (with 4 members this is 25%). It is a clean split and also tests whether the method works on a new person.
-  - Alternative: 25% of each person × object × label, chosen with a fixed seed.
+- Put 20% aside (80/20). **Decision:** a random 20% of each person × object × label group (2 of every 10 clips), chosen with a fixed seed (`make_split.py`, seed 144). This gives 128 train / 32 test, with test balanced 16 light / 16 firm and every person and object in both sets.
+  - Rejected alternative: hold out all recordings of one member (25%). It tests generalisation to a new person, but costs a quarter of the training data. Leave-one-person-out validation (below) still measures that.
 - Save the split to `Part3/data/split.csv` and commit it. That file is the record of which recordings are in the test set (the report must say this).
 - Whole grips only: all frames of one clip go to the same set.
 - Nothing is fit on the test set: no classifier weights, no thresholds, no feature normalisation / scaler.
-- Validation on the remaining people: **leave-one-person-out** (train on 2, validate on 1, rotate). The tree reports the mean validation accuracy.
+- Validation on the 128 train clips: **leave-one-person-out** (train on 3 people, validate on the 4th, rotate). The tree reports the mean validation accuracy.
 
 ## 3. Pipeline / code
 
@@ -58,7 +58,7 @@ Every file starts with a code map, and its last line names the AI model used (se
 - CLIP ViT-B/32: alternative image features
 - VideoMAE / X-CLIP: a true video encoder, which may capture the squeeze motion
 
-**Classifier:** start with logistic regression (the baseline), then a small MLP (e.g. 1 hidden layer of 64, dropout, early stopping on validation). With about 120 training grips, the MLP may overfit. If it does, that is a valid tree result.
+**Classifier:** start with logistic regression (the baseline), then a small MLP (e.g. 1 hidden layer of 64, dropout, early stopping on validation). With 128 training grips, the MLP may overfit. If it does, that is a valid tree result.
 
 Extra packages needed (add to `requirements.txt` when we start): `torch`, `transformers` (or `timm`), `opencv-python`, `scikit-learn`.
 

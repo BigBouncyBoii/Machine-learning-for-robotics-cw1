@@ -1,6 +1,7 @@
 # CODE MAP of make_split.py
 #   Settings       random seed, paths
-#   Choose test    hold out ALL clips of one person (25% of the data), person drawn with a fixed seed
+#   Choose test    random 20% of the clips, stratified: 2 of the 10 clips in every person x object x label
+#                  group (fixed seed), so test is balanced and every person/object/label is in both sets
 #   Save           data/split.csv: every clip from labels.csv plus its set ("train" or "test")
 #   AI use         Claude Opus 5.5 (claude-opus-5-5), default setting
 #
@@ -17,7 +18,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-SEED = 144
+SEED = 42
+TEST_FRAC = 0.2       # 80/20 train/test
 HERE = Path(__file__).resolve().parent
 LABELS = HERE / "data" / "labels.csv"
 OUT = HERE / "data" / "split.csv"
@@ -27,11 +29,13 @@ if OUT.exists():
 
 # %% Choose test
 df = pd.read_csv(LABELS)
-people = sorted(df["person"].unique())
-test_person = np.random.default_rng(SEED).choice(people)   # random, so nobody picks the "easy" person
-df["set"] = np.where(df["person"] == test_person, "test", "train")
+rng = np.random.default_rng(SEED)
+df["set"] = "train"
+for _, group in df.groupby(["person", "object", "label"]):   # whole clips are drawn, so all frames of a clip stay together
+    n_test = round(TEST_FRAC * len(group))
+    df.loc[rng.choice(group.index, n_test, replace=False), "set"] = "test"
 
 # %% Save
 df[["file", "person", "object", "label", "set"]].to_csv(OUT, index=False)
-print(f"test person: {test_person}")
+print(df["set"].value_counts().to_string())
 print(df.groupby(["set", "person", "object", "label"]).size().unstack("label"))
