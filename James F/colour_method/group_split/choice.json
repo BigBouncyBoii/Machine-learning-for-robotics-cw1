@@ -1,0 +1,10 @@
+{
+  "input": "nail + mid Lab curves",
+  "model": "MLP x10, alpha 10",
+  "criterion": "mean validation log loss",
+  "val_acc": 0.6583,
+  "val_logloss": 0.5756,
+  "fingerprint": "3696c80d",
+  "n_ensemble": 10,
+  "seeds": "0..9"
+}
