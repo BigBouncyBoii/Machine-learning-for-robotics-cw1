@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Section C: validate + verify + plots",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_validation_and_plot.py",
+      "python": "${workspaceFolder}/../.venv/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true,
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  ]
+}

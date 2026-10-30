@@ -1,0 +1,170 @@
+[
+  {
+    "person": "A",
+    "object": "hard",
+    "file": "A/A_hard_firm_01.MOV",
+    "mov_shape": [
+      3840,
+      2160,
+      3
+    ],
+    "mp4_shape": [
+      854,
+      480,
+      3
+    ],
+    "mov_rotation": 90.0,
+    "mp4_rotation": 0.0,
+    "mov_fps": 59.964093357271096,
+    "mp4_fps": 30.0,
+    "mov_frames": 167.0,
+    "mp4_frames": 84.0
+  },
+  {
+    "person": "A",
+    "object": "soft",
+    "file": "A/A_soft_firm_01.MOV",
+    "mov_shape": [
+      3840,
+      2160,
+      3
+    ],
+    "mp4_shape": [
+      854,
+      480,
+      3
+    ],
+    "mov_rotation": 90.0,
+    "mp4_rotation": 0.0,
+    "mov_fps": 59.97753650318233,
+    "mp4_fps": 30.0,
+    "mov_frames": 267.0,
+    "mp4_frames": 134.0
+  },
+  {
+    "person": "B",
+    "object": "hard",
+    "file": "B/B_hard_firm_01.MOV",
+    "mov_shape": [
+      3840,
+      2160,
+      3
+    ],
+    "mp4_shape": [
+      854,
+      480,
+      3
+    ],
+    "mov_rotation": 90.0,
+    "mp4_rotation": 0.0,
+    "mov_fps": 59.97425997425997,
+    "mp4_fps": 30.0,
+    "mov_frames": 233.0,
+    "mp4_frames": 117.0
+  },
+  {
+    "person": "B",
+    "object": "soft",
+    "file": "B/B_soft_firm_01.MOV",
+    "mov_shape": [
+      3840,
+      2160,
+      3
+    ],
+    "mp4_shape": [
+      854,
+      480,
+      3
+    ],
+    "mov_rotation": 90.0,
+    "mp4_rotation": 0.0,
+    "mov_fps": 59.97060264576188,
+    "mp4_fps": 30.0,
+    "mov_frames": 204.0,
+    "mp4_frames": 102.0
+  },
+  {
+    "person": "C",
+    "object": "hard",
+    "file": "C/C_hard_firm_02.MOV",
+    "mov_shape": [
+      3840,
+      2160,
+      3
+    ],
+    "mp4_shape": [
+      854,
+      480,
+      3
+    ],
+    "mov_rotation": 90.0,
+    "mp4_rotation": 0.0,
+    "mov_fps": 59.97102848865283,
+    "mp4_fps": 30.0,
+    "mov_frames": 207.0,
+    "mp4_frames": 104.0
+  },
+  {
+    "person": "C",
+    "object": "soft",
+    "file": "C/C_soft_firm_02.MOV",
+    "mov_shape": [
+      3840,
+      2160,
+      3
+    ],
+    "mp4_shape": [
+      854,
+      480,
+      3
+    ],
+    "mov_rotation": 90.0,
+    "mp4_rotation": 0.0,
+    "mov_fps": 59.97414907367514,
+    "mp4_fps": 30.0,
+    "mov_frames": 232.0,
+    "mp4_frames": 116.0
+  },
+  {
+    "person": "D",
+    "object": "hard",
+    "file": "D/D_hard_firm_01.MOV",
+    "mov_shape": [
+      3840,
+      2160,
+      3
+    ],
+    "mp4_shape": [
+      854,
+      480,
+      3
+    ],
+    "mov_rotation": 90.0,
+    "mp4_rotation": 0.0,
+    "mov_fps": 59.97001499250375,
+    "mp4_fps": 30.0,
+    "mov_frames": 200.0,
+    "mp4_frames": 100.0
+  },
+  {
+    "person": "D",
+    "object": "soft",
+    "file": "D/D_soft_firm_01.MOV",
+    "mov_shape": [
+      3840,
+      2160,
+      3
+    ],
+    "mp4_shape": [
+      854,
+      480,
+      3
+    ],
+    "mov_rotation": 90.0,
+    "mp4_rotation": 0.0,
+    "mov_fps": 59.95921142080218,
+    "mp4_fps": 30.0,
+    "mov_frames": 147.0,
+    "mp4_frames": 74.0
+  }
+]

@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+cache*/
+work/
+results/frozen_model.joblib
+results/frozen_method.json
+results/formal_test_started.json
+results/train_representatives.jpg
+
+!.vscode/
+!.vscode/launch.json

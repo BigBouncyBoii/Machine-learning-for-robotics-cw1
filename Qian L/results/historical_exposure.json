@@ -1,0 +1,13 @@
+{
+  "identity_basis": "labels.original + person/object/label matched to old inventory; not binary-content verification",
+  "matched": 160,
+  "test_count": 40,
+  "test_old_sets": {
+    "train": 27,
+    "test": 10,
+    "validation": 3
+  },
+  "test_with_artifact_evidence": 30,
+  "test_potential_historical_development": 30,
+  "limitation": "Actual prior human viewing cannot be reconstructed fully. Old thresholds/ROI were developed using A-C; outer LOPO scores are not a pristine evaluation of all preprocessing choices. Test must not be described as previously unseen."
+}

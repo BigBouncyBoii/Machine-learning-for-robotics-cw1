@@ -1,0 +1,14 @@
+{
+  "train_cache_hits": 120,
+  "predictions_recomputed_and_serialization_checked": 720,
+  "folds_checked": 24,
+  "fold_scaler_means_match_training_only": true,
+  "bad_fingerprint_rejected": true,
+  "missing_feature_fallback_checked": true,
+  "constant_translation_vs_oscillation_checked": true,
+  "test_cache_count": 0,
+  "formal_test_run": false,
+  "freeze_refit_and_model_reload_checked_in_temporary_directory": true,
+  "existing_formal_test_marker_blocks_test_before_extraction": true,
+  "split_sha256": "809b57a00fbbd7a77bb40b4910a314919af1ede4bb7454e1dbbe4d8ef67f6c89"
+}

@@ -1,0 +1,57 @@
+{
+  "source_script": "plot_results.py",
+  "test_fingerprint": "3696c80d",
+  "evaluation": "120 train clips; four-fold leave-one-person-out; no formal test",
+  "trials": [
+    "speed",
+    "shaking",
+    "both"
+  ],
+  "selected_methods": {
+    "speed": "speed_C1",
+    "shaking": "shaking_C0.1",
+    "both": "both_C0.1"
+  },
+  "confusion_order": [
+    "light",
+    "firm"
+  ],
+  "confusion_matrices": {
+    "speed": [
+      [
+        33,
+        27
+      ],
+      [
+        25,
+        35
+      ]
+    ],
+    "shaking": [
+      [
+        39,
+        21
+      ],
+      [
+        24,
+        36
+      ]
+    ],
+    "both": [
+      [
+        38,
+        22
+      ],
+      [
+        27,
+        33
+      ]
+    ]
+  },
+  "feature_count": 120,
+  "figures": [
+    "validation_overview",
+    "validation_confusion",
+    "train_feature_distributions"
+  ]
+}

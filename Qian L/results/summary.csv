@@ -1,0 +1,4 @@
+method,window,features,C,mean_validation_accuracy,coverage,fallback_count,hard_accuracy,soft_accuracy,n_features
+shaking_C0.1,shaking,shaking,0.1,0.625,1.0,0,0.65,0.6,4
+both_C0.1,both,both,0.1,0.5916666666666667,1.0,0,0.6,0.5833333333333334,8
+speed_C1,speed,speed,1.0,0.5666666666666667,1.0,0,0.5666666666666667,0.5666666666666667,4

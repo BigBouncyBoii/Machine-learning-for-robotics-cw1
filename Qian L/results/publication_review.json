@@ -1,0 +1,43 @@
+{
+  "status": "passed before publication",
+  "review_date": "2026-10-30",
+  "destination": "main/Qian L/",
+  "test_fingerprint": "3696c80d",
+  "shared_data_location": "Part3/data/",
+  "split_sha256": "809b57a00fbbd7a77bb40b4910a314919af1ede4bb7454e1dbbe4d8ef67f6c89",
+  "remote_local_shared_csvs_match": true,
+  "shared_split_modified": false,
+  "train_clips": 120,
+  "test_clips": 40,
+  "validation": "LeaveOneGroupOut(person), train clips only; 90/30 each fold",
+  "trial_count": 3,
+  "hyperparameter_combinations": 6,
+  "fold_fits": 24,
+  "checked_oof_predictions": 720,
+  "model": "fold-local StandardScaler + LogisticRegression, random_state=0, one seed",
+  "selection": "mean all-clip validation accuracy; ties fewer features, smaller C, method name",
+  "selected_method": "shaking_C0.1",
+  "validation_accuracy": {
+    "speed": 0.5666666666666667,
+    "shaking": 0.625,
+    "both": 0.5916666666666667
+  },
+  "identical_predictions_after_relocation": true,
+  "all_trials_feature_coverage": 1.0,
+  "final_method_frozen": false,
+  "formal_test_run": false,
+  "test_feature_caches": 0,
+  "helper_direct_execution_checks_fingerprint": true,
+  "historical_exposure_disclosed": true,
+  "colour_mask_and_timing_limitations_disclosed": true,
+  "final_entry": "FinalMethod.py --freeze; then --run-test only after agreed freeze",
+  "uploads_exclude": [
+    "videos",
+    "video_frame_previews",
+    "virtual_environment",
+    "caches",
+    "old_models",
+    "historical_branches"
+  ],
+  "notes": "Tests and metrics verified in relocated folder. No test predictions or test visual diagnostics were generated. No other member files or shared data are included in this publication."
+}
