@@ -1,0 +1,7 @@
+numpy
+pandas
+scikit-learn
+joblib
+matplotlib
+opencv-contrib-python   # one OpenCV only: mediapipe needs contrib, and two OpenCV packages overwrite each other
+mediapipe

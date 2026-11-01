@@ -1,8 +1,11 @@
 numpy
 pandas
+opencv-contrib-python   # one OpenCV only: mediapipe needs contrib, and two OpenCV packages overwrite each other
 matplotlib
+scikit-learn
+scipy
+mediapipe
+joblib
 pillow
 torch
 transformers
-opencv-python-headless
-scikit-learn

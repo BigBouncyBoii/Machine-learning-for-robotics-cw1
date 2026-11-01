@@ -1,0 +1,8 @@
+numpy
+pandas
+scipy
+scikit-learn
+opencv-contrib-python
+pillow
+torch
+transformers

@@ -1,0 +1,16 @@
+# Output of: python Part3/FinalMethod.py   (run once, 2026-11-01; group final method)
+method: dinov2_middle + mlp
+train clips: 120  test clips: 40  (test set fingerprint 3696c80d)
+
+TEST accuracy: 38/40 = 0.950  (guessing = 0.50)
+chance of doing this well by guessing (one-sided binomial p): 7.5e-10
+single-seed accuracies: 0.950, 0.925, 0.950, 0.900, 0.950
+
+by object: hard 0.95  soft 0.95
+
+by person: A 0.90  B 0.90  C 1.00  D 1.00
+
+confusion matrix (rows = true, cols = predicted)
+            pred light  pred firm
+true light          20          0
+true firm            2         18

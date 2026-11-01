@@ -1,0 +1,2 @@
+extractor,features,classifier,val_A,logloss_A,val_B,logloss_B,val_C,logloss_C,val_D,logloss_D,mean_acc,mean_logloss,hard_acc,soft_acc,train_acc
+joint_angles,joint_angles,lr,0.5667,1.1131,0.6333,0.6185,0.5667,0.7922,0.6000,0.6684,0.5917,0.7981,0.5833,0.6000,0.8583

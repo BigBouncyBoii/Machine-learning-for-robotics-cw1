@@ -31,8 +31,7 @@ BETA1 = 0.9
 BETA2 = 0.999
 EPS = 1e-8
 
-FORGET_DERIVATIVE = False   # what-if: replace the tanh slope 1 - a^2 by 1
-OUT_DIR = "results_forgotten_derivative" if FORGET_DERIVATIVE else "results_normal"
+OUT_DIR = "results_normal"
 os.makedirs(OUT_DIR, exist_ok=True)
 
 # %% Load data
@@ -77,7 +76,7 @@ def deltas(di, a1, y):
 
   # hidden delta: delta1_j = ∂E/∂n1_j = delta2 · ∂n2/∂a1_j · ∂a1_j/∂n1_j
   dn2da1 = W2.T                    # (3,1), one weight W2_j per hidden node
-  da1dn1 = 1 if FORGET_DERIVATIVE else 1 - a1**2   # (3,1), slope of tanh
+  da1dn1 = 1 - a1**2               # (3,1), slope of tanh
   delta1 = delta2 * dn2da1 * da1dn1   # (3,1)
   return delta1, delta2
 
