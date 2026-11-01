@@ -4,58 +4,65 @@
 This uses optical flow only: no landmarks, no MediaPipe. The labels are the participant's intended grip, not measured force.
 
 ```
-frame (long edge 320) ─► fixed hand/object ROI + YCrCb skin mask ─► Farneback optical flow between adjacent frames
+frame (long edge 320) ─► fixed hand/object region + YCrCb skin mask ─► Farneback optical flow between adjacent frames
 clip  ─► speed features (10–45 % of clip) and/or shaking features (45–85 %) ─► StandardScaler ─► LogisticRegression
 ```
 
-## What I explored
+Every number here is **mean leave-one-person-out validation accuracy on the 120 train clips** of the group split
+(`Part3/data/split.csv`, fingerprint `3696c80d`). The 40 test clips are never used for validation. Guessing = 50 %.
 
-Three trials. Each compares C ∈ {0.1, 1}, using leave-one-person-out validation on the 120 train clips (`LeaveOneGroupOut`).
+## Layout
 
-- **Speed proxy** (4 features): mean and 90th-percentile local speed, and inward speed toward the region centroid. Bulk motion is removed first.
-- **Shaking proxy** (4 features): hand motion minus background motion. Features are detrended position RMS, velocity jitter RMS, acceleration RMS and reversal rate.
-- **Both:** the 8 features together.
+| Path | What it is |
+|---|---|
+| `main.py` | Entry point: LOPO validation of every node and C → `results/validation.csv`; `--figures`; `--test` (once) |
+| `common.py` | Paths, clips + split (fingerprint check), scaler pipeline, `validate()` (same as the other members) |
+| `extractors/motion.py` | Shared: optical flow of every frame pair, cache, the window rules. Not a node itself |
+| `extractors/speed.py` | Node: finger-closing speed. `WINDOW = (0.10, 0.45)`, 4 features |
+| `extractors/shaking.py` | Node: hand shaking. `WINDOW = (0.45, 0.85)`, 4 features |
+| `extractors/both.py` | Node: the 8 features together |
+| `classifiers/lr.py` | Logistic regression, C ∈ {0.1, 1}; a clip with no usable motion gets the training majority label |
+| `plots.py` | Validation overview, raw feature distributions (train clips only) |
+| `cache/motion_series.json.gz` | Per-frame optical-flow samples of all 160 clips (no labels), so re-runs take seconds |
+| `results/` | `validation.csv`, `figures/` (and `test_report.txt` once the test is run) |
+| `archive/` | The original pipeline (`explore.py`, `features.py`, `verify.py`, `FinalMethod.py`, …) and its `results/`. **Not submitted.** |
 
-| Trial | C | Validation | Hard | Soft |
-|---|---|---|---|---|
-| Speed | 1.0 | 56.7 % | 56.7 % | 56.7 % |
-| **Shaking** | 0.1 | **62.5 %** | 65.0 % | 60.0 % |
-| Both | 0.1 | 59.2 % | 60.0 % | 58.3 % |
+## Tree nodes
 
-**Proposed method:** shaking + LR (C = 0.1). Selected by mean validation accuracy; ties prefer fewer features, then smaller C.
-It is not frozen yet, and the 40-clip test has **not** been run (status 2026-11-01).
+`python main.py` runs all of them (seconds, from the cache). One node: `python main.py --features shaking`.
+
+| Node | C = 0.1 | C = 1 | Hard / soft (best C) |
+|---|---|---|---|
+| Speed (early window) | 55.0 % | 55.0 % | 53 / 57 % |
+| **Shaking (later window)** | 59.2 % | **60.8 %** | 67 / 55 % |
+| Both | 58.3 % | 60.0 % | 63 / 57 % |
+
+**Chosen** by Qian L's rule (highest mean accuracy; ties → fewer features, then smaller C): **shaking, C = 1**.
+`python main.py --test` validates, applies that rule, and tests the chosen version once → `results/test_report.txt`.
+**Test: not run yet.**
+
+**These numbers differ from Qian L's original run** (`archive/results/summary.csv`: speed 56.7, shaking 62.5 with C = 0.1,
+both 59.2 %). The code is the same: the original `archive/explore.py`, run on this machine with the same cache, gives exactly the
+numbers above. The difference is the video decoder (Windows vs Linux), which changes the optical flow slightly. With ~30 clips
+per held-out person, one or two clips move each number by 3 %, and the best C flips; the conclusion (shaking is the best of the
+three, ~60 %, just above guessing) does not change. Report one machine's numbers consistently.
 
 **Limitations:**
-- The skin mask also picks up pale wall/table.
-- The fixed windows can include approach, lift and release.
-- Some current test clips were seen under an older protocol (`results/historical_exposure.csv`).
-
-## Files
-
-| File | What it does |
-|---|---|
-| `protocol.py` | Loads the shared split, checks fingerprint `3696c80d`, helper functions |
-| `features.py` | Optical-flow speed and shaking features, with a per-clip cache (`cache_speed_shaking_v2/`, git-ignored) |
-| `explore.py` | LOPO validation of the three trials → `results/summary.csv`, `tuning.csv`, `folds.csv`, `proposed_method.json` |
-| `verify.py` | Recomputes out-of-fold predictions and checks the fingerprint and fallback rules |
-| `plot_results.py` | Figures → `results/figures/` |
-| `run_validation_and_plot.py` | Runs explore + verify + plot in one go |
-| `FinalMethod.py` | `--freeze` the chosen method, then `--run-test` once |
-| `DETAILS.md` | Full method description, failure policy and limitations |
-| `PROTOCOL.md` | The shared group rules |
+- The skin mask also picks up pale wall/table; the fixed windows can include approach, lift and release.
+- **Some test clips were seen in Qian L's earlier project** under another protocol (`archive/results/historical_exposure.csv`:
+  30 of the 40 test clips have artifacts there). Do not describe the test set as never seen for this branch.
 
 ## How to run
 
-From the repo root, with the venv activated. The scripts work from any folder.
+From anywhere, with the repo venv activated:
 
 ```bash
 pip install -r "Part3/Qian L/requirements.txt"
-
-python "Part3/Qian L/run_validation_and_plot.py"    # validate + verify + plots (first run extracts 120 train clips)
-
-# only when the method is final:
-python "Part3/Qian L/FinalMethod.py" --freeze
-python "Part3/Qian L/FinalMethod.py" --run-test       # ONCE; repeated tests are refused
+python "Part3/Qian L/main.py" --figures     # validate all nodes + figures
+python "Part3/Qian L/main.py" --test        # ONCE
 ```
 
-`--freeze` refuses to run if the code has changed since `explore.py` last ran. Re-run validation after any edit.
+If a clip is missing from `cache/`, it is decoded first (~3 s per clip).
+
+AI use: original code GPT-6 (Codex), **version and setting: Qian L to fill in** (also in the code maps marked `<Qian L to fill in>`);
+restructure by Claude Opus 5.5 (`claude-opus-5-5`), default setting.

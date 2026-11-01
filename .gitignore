@@ -5,6 +5,11 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 
+# Temporary files the scripts can leave behind (interrupted writes / downloads, MATLAB autosave)
+*.tmp
+*.download
+*.asv
+
 # Editors / OS
 .vscode/
 .idea/
@@ -20,6 +25,10 @@ Thumbs.db
 # Part 3 recordings and cached features (too large; not submitted)
 Part3/data/videos/
 Part3/James L/cache/
+# Qian L: old per-clip caches keyed by absolute path (superseded by Qian L/cache/motion_series.json.gz),
+# and the fitted model of the archived freeze/test pipeline
+Part3/Qian L/archive/cache_speed_shaking_v2/
+Part3/Qian L/archive/results/frozen_model.joblib
 *.mp4
 *.mov
 # ...but keep the compressed 480p copies (~40 MB) so the team can share them
