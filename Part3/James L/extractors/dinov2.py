@@ -1,16 +1,16 @@
-# CODE MAP of extractors/dinov2.py   (tree nodes: frozen DINOv2 image encoder, pooled over frames)
+# CODE MAP of extractors/dinov2.py   (tree node: frozen DINOv2 image encoder, baseline)
 #   Settings        model, input size, ImageNet normalisation, cache files
 #   Encoder         frozen DINOv2 on each frame separately: CLS vector and mean of patch vectors (384 each)
 #   Cache           encode all 160 clips once (no labels) -> cache/dinov2_small.npz (16 frames),
 #                   cache/dinov2_small_8f.npz (8 frames re-sampled from the video)
-#   Feature sets    POOL: how the per-frame vectors become one vector per clip (one tree node each);
-#                   load() -> {name: X (160, 384)}
+#   Feature sets    baseline node: mean CLS or mean patch vector of all 16 frames; load() -> {name: X (160, 384)}
+#                   mean_cls() and pooled() are shared with dinov2_frames.py and dinov2_phase.py
 #   AI use          Claude Opus 5.5 (claude-opus-5-5), default setting
 #
 # IMAGE encoder: every frame is encoded on its own, so the order of frames is lost unless the pooling uses it.
 # The encoder is frozen (never trained); only the classifier on top is trained. 160 clips are far too few
 # to train a vision model, so a pretrained one turns each frame into a feature vector.
-# (was encoders/dinov2.py, extract_features.py, common.FEATURES and frames_node.py)
+# (was encoders/dinov2.py, extract_features.py and common.FEATURES)
 
 # %% Settings
 import time
@@ -65,23 +65,28 @@ def load_cache(clips, n_frames):
 
 
 # %% Feature sets
-# name -> (frame count of the cache, pooling: arrays with a clip axis -> (n_clips, 384))
+def mean_cls(frames=None):
+    """Pooling: mean CLS vector over the given frames (indices into the cached frames; None = all of them)."""
+    if frames is None:
+        return lambda f: f["cls"].mean(axis=1)
+    return lambda f: f["cls"][:, frames].mean(axis=1)
+
+
+def pooled(clips, names, pool):
+    """{name: X (n_clips, 384)} for the given names of a POOL dict; each cache file is read once."""
+    caches = {n: load_cache(clips, n) for n in sorted({pool[s][0] for s in names})}
+    return {s: pool[s][1](caches[pool[s][0]]) for s in names}
+
+
+# name -> (frames per clip in the cache, pooling: arrays with a clip axis -> (n_clips, 384))
+# Baselines only; the frame-count node is in dinov2_frames.py, the grip-phase node in dinov2_phase.py.
 POOL = {
-    "dinov2_cls_mean":     (16, lambda f: f["cls"].mean(axis=1)),             # mean CLS of the 16 frames (baseline)
-    "dinov2_patch_mean":   (16, lambda f: f["patch"].mean(axis=1)),           # mean patch vector: local detail
-    # fewer frames (subsets of the cached 16, evenly spaced): does averaging more frames help?
-    "dinov2_1frame":       (16, lambda f: f["cls"][:, 8]),                    # middle frame only
-    "dinov2_4frames":      (16, lambda f: f["cls"][:, ::4].mean(axis=1)),     # frames 0, 4, 8, 12
-    "dinov2_8frames":      (16, lambda f: f["cls"][:, ::2].mean(axis=1)),     # every 2nd frame
-    "dinov2_resampled_8":  (8, lambda f: f["cls"].mean(axis=1)),              # 8 frames re-sampled from the video
-    # one phase of the grip: where is the signal?
-    "dinov2_start":        (16, lambda f: f["cls"][:, :3].mean(axis=1)),      # first 3 frames (not gripping yet)
-    "dinov2_middle":       (16, lambda f: f["cls"][:, 5:11].mean(axis=1)),    # middle 6 frames (squeeze / hold)
+    "dinov2_cls_mean":   (16, mean_cls()),                                # mean CLS of all 16 frames (baseline)
+    "dinov2_patch_mean": (16, lambda f: f["patch"].mean(axis=1)),         # mean patch vector: local detail
 }
 FEATURE_SETS = list(POOL)
 
 
 def load(clips, names=FEATURE_SETS):
-    """{feature set name: X (n_clips, 384)}, rows in clips order; each cache is read once."""
-    caches = {n: load_cache(clips, n) for n in sorted({POOL[s][0] for s in names})}
-    return {s: POOL[s][1](caches[POOL[s][0]]) for s in names}
+    """{feature set name: X (n_clips, 384)}, rows in clips order."""
+    return pooled(clips, names, POOL)
