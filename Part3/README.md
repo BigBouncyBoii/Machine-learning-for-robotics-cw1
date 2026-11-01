@@ -36,12 +36,16 @@ Pick 5–15 nodes for the report; every number is a validation accuracy from the
 
 ```
 Question: can video tell a light grip from a firm grip?
-├─ Frozen DINOv2, mean of 16 frames + MLP (JL): a pretrained image model, too few clips to train one; val 63.8 % → kept
-│  ├─ VideoMAE video encoder (JL): does the motion of the squeeze add signal? val 57.8 % (LR 65.8 %) → dropped
-│  ├─ Fewer frames: 1 / 4 / 8 (JL): does averaging all 16 dilute the grip? val 70.0 / 66.7 / 64.5 % → fewer is better
-│  └─ Grip phase: start vs middle frames (JL): where is the signal?
-│     ├─ start (frames 0–2, before the grip): val 49.8 % → guessing: the scene does not leak the label
-│     └─ middle (frames 5–10, squeeze/hold): val 74.3 % (ensemble 75.0 %) → CHOSEN
+├─ DINOv2 (frozen), mean of 16 frames (JL): pretrained image model, too few clips to train one
+│  │  val 63.8 % MLP, 62.5 % LR → baseline, MLP kept
+│  ├─ VideoMAE (JL): a video model, does seeing the motion help?
+│  │     val 57.8 % MLP, 65.8 % LR → inconsistent (+4 clips with LR, mostly person C; −7 with MLP);
+│  │     it takes all 16 frames together, so it can't be limited to part of the grip → dropped
+│  └─ Fewer frames: 1 / 4 / 8 of the 16 (JL): does averaging all 16 dilute the grip?
+│     │  val 70.0 / 66.7 / 64.5 % MLP → the single middle frame is best
+│     └─ Grip phase (JL): start (frames 0–2) vs middle third (frames 5–10)
+│        ├─ start: val 49.8 % → guessing: the scene does not give the label away
+│        └─ middle: val 74.3 % MLP (75.0 % as the 5-MLP ensemble), 72.5 % LR → CHOSEN
 ├─ Finger colour, rest vs hold window, LR (JF): blanching makes squeezed fingertips paler; val 60.0 % → refined
 │  └─ Per-finger colour curves over time (JF): nails + middle segments, 10 time bins; val 70.0 % (LR) → kept
 │     └─ 10-MLP ensemble (JF): a non-linear model on the same curves; val 65.8 % (alpha 10) → no better than LR
@@ -52,6 +56,15 @@ Question: can video tell a light grip from a firm grip?
 └─ Finger joint angles, MediaPipe (JE): a firm grip bends the fingers more; val 59.2 %; hand found in 42 % of frames → dropped
 Final method on the test set: DINOv2 middle frames + MLP ensemble, 38/40 = 95.0 %.
 ```
+
+**James L's nodes, notes for the viva:**
+- Every James L node was run with **both** LR and MLP (`main.py` default), so each line gives both numbers;
+  MLP is the main classifier, and LR is shown so no result is hidden (e.g. VideoMAE + LR).
+- **Why 6 frames?** 16 frames are sampled evenly over the whole clip, so frame *i* is at *i*/15 of the clip:
+  frames 5–10 are 33–67 %, the **middle third**, when the hand squeezes and holds. The window was picked in
+  advance as "the hold phase", **not tuned**: only start (0–2) and middle (5–10) were tried.
+- 8 vs 16 frames is a side check, not a step: 8 re-sampled from the video scores 62.0 % vs 63.8 % for 16 (MLP),
+  so the number of frames is not what matters; *which* frames is.
 
 ### Node → code
 
