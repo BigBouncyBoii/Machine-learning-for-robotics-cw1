@@ -81,10 +81,10 @@ How it's scored: 1 = done and result reported; 2 = also, test set not used for t
 |---|---|
 | Recordings: 4 people × 2 objects (hard + soft) × 10 light + 10 firm = 160 clips | Done (`data/labels.csv`) |
 | Test set put aside before exploring (40 clips, 25%, whole clips) | Done: `data/split.csv`, fingerprint `3696c80d`, made by `make_split.py` |
-| Nodes by every member | James L, James F, Qian L, Jeevan: see `node_exploration.md` |
+| Nodes by every member | James L, James F, Qian L, Jeevan: see `README.md` (Members' branches) |
 | Final method chosen on validation | James L's DINOv2 middle frames + MLP (val 74.3%) in `Part3/FinalMethod.py` |
-| Final test run once, result vs 50% | **Still to do / confirm** |
-| Tree drawn (5–15 one-line nodes, with initials) | **Still to do** (raw material is in `node_exploration.md`) |
+| Final test run once, result vs 50% | Done: 38/40 = 95.0 % vs 50 % guessing (p = 7.5e-10), `final_test_result.txt` |
+| Tree drawn (5–15 one-line nodes, with initials) | **Draft** in `README.md` (Exploration tree): pick the final 5–15 nodes |
 | Input/output figure of the final method | **Still to do / confirm** |
 | Data-count table (per person / object / label) | **Still to do** (10 per person/object/label; train 30 / test 10 per person) |
 | Code maps with an AI-use line in every file | `Jeevan/FingerAnglesJeevan.py` still has a placeholder AI-use line |
