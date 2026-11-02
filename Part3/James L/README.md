@@ -19,6 +19,7 @@ Every number here is **mean leave-one-person-out validation accuracy on the 120 
 | `extractors/dinov2.py` | DINOv2 ViT-S/14 image encoder (frozen), cache, baseline node (mean of all 16 frames) |
 | `extractors/dinov2_frames.py` | Node: how many frames. `frames_used()` lists exactly which frames each version averages |
 | `extractors/dinov2_phase.py` | Node: which phase of the grip. `frames_used()`: start = frames 0–2, middle = frames 5–10 of 16 |
+| `extractors/dinov2_window.py` | Node: how many middle frames. 1–10 frames centred on the middle of the 16 (`mid6` = `dinov2_middle`) |
 | `extractors/videomae.py` | VideoMAE ViT-B video encoder (frozen), one 768-d vector per clip |
 | `classifiers/lr.py` | Logistic regression, C = 0.1 |
 | `classifiers/mlp.py` | One MLP, 64 ReLU units, alpha 0.01; validated with 5 seeds, **mean of their accuracies** |
@@ -41,6 +42,9 @@ Every number here is **mean leave-one-person-out validation accuracy on the 120 
 | | `dinov2_resampled_8` (vs 16 = `dinov2_cls_mean`) | 62.5 % | 62.0 % | 61.7 % |
 | Which phase of the grip? (`dinov2_phase.py`) | `dinov2_start` (control, frames 0–2) | 50.0 % | 49.8 % | 49.2 % |
 | | **`dinov2_middle`** (frames 5–10) | 72.5 % | **74.3 %** | 75.0 % |
+| How many middle frames? (`dinov2_window.py`) | `dinov2_mid1` / `2` / `4` / `6` / `8` / `10` | 68.3 / 67.5 / 70.0 / 72.5 / 72.5 / 71.7 % | 70.0 / 70.5 / 71.0 / 74.3 / 71.8 / 71.8 % | 69.2 / 72.5 / 72.5 / **75.0** / 71.7 / 71.7 % |
+
+Tree order: baseline (LR) → MLP → 5-MLP ensemble (64.2 % on 16 frames) → phase → window width; from the ensemble on, the tree quotes the ensemble column.
 
 One command runs every row: `python main.py --classifier lr mlp mlp_ensemble` (about 20 s from the cache).
 One node: `python main.py --features dinov2_phase` (an extractor name runs all its feature sets). Every model reaches 100 % training accuracy (`train_acc`).

@@ -36,35 +36,30 @@ Pick 5–15 nodes for the report; every number is a validation accuracy from the
 
 ```
 Question: can video tell a light grip from a firm grip?
-├─ DINOv2 (frozen), mean of 16 frames (JL): pretrained image model, too few clips to train one
-│  │  val 63.8 % MLP, 62.5 % LR → baseline, MLP kept
-│  ├─ VideoMAE (JL): a video model, does seeing the motion help?
-│  │     val 57.8 % MLP, 65.8 % LR → inconsistent (+4 clips with LR, mostly person C; −7 with MLP);
-│  │     it takes all 16 frames together, so it can't be limited to part of the grip → dropped
-│  └─ Fewer frames: 1 / 4 / 8 of the 16 (JL): does averaging all 16 dilute the grip?
-│     │  val 70.0 / 66.7 / 64.5 % MLP → the single middle frame is best
-│     └─ Grip phase (JL): start (frames 0–2) vs middle third (frames 5–10)
-│        ├─ start: val 49.8 % → guessing: the scene does not give the label away
-│        └─ middle: val 74.3 % MLP (75.0 % as the 5-MLP ensemble), 72.5 % LR → CHOSEN
-├─ Finger colour, rest vs hold window, LR (JF): blanching makes squeezed fingertips paler; val 60.0 % → refined
-│  └─ Per-finger colour curves over time (JF): nails + middle segments, 10 time bins; val 70.0 % (LR) → kept
-│     └─ 10-MLP ensemble (JF): a non-linear model on the same curves; val 65.8 % (alpha 10) → no better than LR
-├─ Hand motion, optical flow (QL): a firm grip may close faster or shake more
-│  ├─ closing speed, early window: val 55.0 % → dropped
-│  ├─ shaking, later window: val 60.8 % → best of the motion nodes
-│  └─ speed + shaking: val 60.0 % → no gain
-└─ Finger joint angles, MediaPipe (JE): a firm grip bends the fingers more; val 59.2 %; hand found in 42 % of frames → dropped
-Final method on the test set: DINOv2 middle frames + MLP ensemble, 38/40 = 95.0 %.
+├─ DINOv2 frozen + LR, 16 frames (JL): too few clips to train a model; val 62.5 % → baseline
+│  ├─ VideoMAE (JL): does motion help? val 65.8 % LR, 57.8 % MLP → inconsistent, dropped
+│  └─ MLP (JL): non-linear boundary; val 63.8 % → kept
+│     └─ 5-MLP ensemble (JL): one MLP varies with seed (61–67 %); val 64.2 % → kept, stable
+│        ├─ Start, frames 0–2 (JL): control, does the scene leak the label? val 49.2 % → dropped
+│        └─ Middle, frames 5–10 (JL): 16 frames include reach/release; val 75.0 % → kept
+│           └─ Middle 1/2/4/6/8/10 frames (JL): val 69.2/72.5/72.5/75.0/71.7/71.7 % → 6 CHOSEN
+├─ Rest vs hold colour, LR (JF): squeezed fingertips go paler; val 60.0 % → refined
+│  └─ Per-finger colour curves (JF): nails + middle segments over time; val 70.0 % → kept
+│     └─ 10-MLP ensemble (JF): non-linear model; val 65.8 % → no better than LR
+├─ Closing speed, optical flow (QL): firm grips may close faster; val 55.0 % → dropped
+├─ Shaking, optical flow (QL): firm grips may tremble; val 60.8 % → best motion cue
+│  └─ Speed + shaking (QL): combine both; val 60.0 % → no gain
+└─ Joint angles, MediaPipe (JE): firm grips bend fingers more; val 59.2 %, hand in 42 % of frames → dropped
+Final method on test: DINOv2 middle 6 frames + 5-MLP ensemble, 38/40 = 95.0 % (guessing 50 %).
 ```
 
+Diagram of the same tree: `tree.mmd` → `tree.svg` / `tree.png`.
+
 **James L's nodes, notes for the viva:**
-- Every James L node was run with **both** LR and MLP (`main.py` default), so each line gives both numbers;
-  MLP is the main classifier, and LR is shown so no result is hidden (e.g. VideoMAE + LR).
-- **Why 6 frames?** 16 frames are sampled evenly over the whole clip, so frame *i* is at *i*/15 of the clip:
-  frames 5–10 are 33–67 %, the **middle third**, when the hand squeezes and holds. The window was picked in
-  advance as "the hold phase", **not tuned**: only start (0–2) and middle (5–10) were tried.
-- 8 vs 16 frames is a side check, not a step: 8 re-sampled from the video scores 62.0 % vs 63.8 % for 16 (MLP),
-  so the number of frames is not what matters; *which* frames is.
+- After the ensemble node, every JL number is the **ensemble**; before it, LR or single MLP (mean of 5 seeds).
+- **Ensemble:** +0.4 % is under one clip; it is kept because a single MLP swings ~6 % with its seed, not for accuracy.
+- **Frames:** 16 evenly spaced frames, frame *i* at *i*/15 of the clip, so 5–10 = the middle third (33–67 %).
+  The width was then checked on validation (1–10 frames): 6 was best, but only 3 clips ahead of 2 or 4.
 
 ### Node → code
 
@@ -72,8 +67,9 @@ Final method on the test set: DINOv2 middle frames + MLP ensemble, 38/40 = 95.0 
 |---|---|---|---|
 | DINOv2 baseline, 16 frames | JL | `python "Part3/James L/main.py" --features dinov2` | 62.5 % LR, 63.8 % MLP |
 | VideoMAE | JL | `python "Part3/James L/main.py" --features videomae` | 65.8 % LR, 57.8 % MLP |
-| Number of frames | JL | `python "Part3/James L/main.py" --features dinov2_frames` | 1 frame 70.0 %, 4: 66.7 %, 8: 64.5 % (MLP) |
-| Grip phase | JL | `python "Part3/James L/main.py" --features dinov2_phase --classifier lr mlp mlp_ensemble` | start 49.8 %, middle 74.3 % (MLP), 75.0 % (ensemble) |
+| MLP / 5-MLP ensemble | JL | `python "Part3/James L/main.py" --features dinov2_cls_mean --classifier lr mlp mlp_ensemble` | 63.8 % MLP, 64.2 % ensemble |
+| Grip phase | JL | `python "Part3/James L/main.py" --features dinov2_phase --classifier mlp_ensemble` | start 49.2 %, middle 75.0 % |
+| Middle window width | JL | `python "Part3/James L/main.py" --features dinov2_window --classifier mlp_ensemble` | 1/2/4/6/8/10: 69.2/72.5/72.5/75.0/71.7/71.7 % |
 | Rest vs hold colour | JF | `python "Part3/James F/main.py" --features hand_colour --classifier lr` | best 60.0 % (`hand_lab_change`) |
 | Finger colour curves | JF | `python "Part3/James F/main.py" --features finger_patches --classifier lr mlp` | 70.0 % (`nail_mid_a_curve`, LR) |
 | MLP ensemble | JF | `python "Part3/James F/main.py" --features finger_patches --classifier mlp_ensemble` | 65.8 % (chosen by log loss) |
@@ -113,6 +109,7 @@ clip ─► 16 evenly spaced frames ─► frozen encoder ─► pool to one vec
 - `extractors/dinov2.py`: DINOv2 ViT-S/14, each frame on its own (CLS vector, 384-d); baseline = mean of all 16 frames.
 - `extractors/dinov2_frames.py`: which frames are averaged, written out (`[8]`, `[0, 4, 8, 12]`, …).
 - `extractors/dinov2_phase.py`: start = frames `[0, 1, 2]`, middle = frames `[5, …, 10]` of 16.
+- `extractors/dinov2_window.py`: 1–10 frames centred on the middle (`[8]`, `[7, 8]`, …, `[3, …, 12]`).
 - `extractors/videomae.py`: VideoMAE ViT-B, all 16 frames together (sees motion).
 - Classifiers: `lr` (C = 0.1), `mlp` (64 units, mean of 5 seeds' accuracies), `mlp_ensemble` (the 5 MLPs as one model).
 
@@ -125,6 +122,7 @@ clip ─► 16 evenly spaced frames ─► frozen encoder ─► pool to one vec
 | `dinov2_resampled_8` (vs 16 = `cls_mean`) | 62.5 % | 62.0 % | 61.7 % |
 | `dinov2_start` | 50.0 % | 49.8 % | 49.2 % |
 | **`dinov2_middle`** | 72.5 % | **74.3 %** | **75.0 %** |
+| `dinov2_mid1` / `2` / `4` / `6` / `8` / `10` | 68.3 / 67.5 / 70.0 / 72.5 / 72.5 / 71.7 % | 70.0 / 70.5 / 71.0 / 74.3 / 71.8 / 71.8 % | 69.2 / 72.5 / 72.5 / 75.0 / 71.7 / 71.7 % |
 
 - **The signal is in the hold phase.** The start frames score exactly guessing; averaging in rest and release frames dilutes it.
 - **Every model reaches 100 % training accuracy**: 384–768 features and 90 clips per fold, so they memorise.
