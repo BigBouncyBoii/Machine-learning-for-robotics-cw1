@@ -1,0 +1,6 @@
+input,mode,val,test,hard,soft,p_vs_guess
+original (final method),-,0.75,0.95,0.95,0.95,7.466951501555741e-10
+hand_removed,retrained,0.6666666666666666,0.875,0.8,0.95,6.91306013322901e-07
+hand_removed,test only,,0.725,0.75,0.7,0.003213288047845708
+hand_only,retrained,0.65,0.925,0.95,0.9,9.732502803672105e-09
+hand_only,test only,,0.575,0.6,0.55,0.21479525392169307
