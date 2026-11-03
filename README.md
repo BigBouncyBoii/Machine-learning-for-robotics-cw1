@@ -7,7 +7,7 @@ ELEC0144 coursework (assignment Draft 37).
 | Folder   | Contents |
 |----------|----------|
 | `Brief/` | Assignment PDF, data notes (`DATA_README.md`), self-assessment template |
-| `Part1/` | Task 1: image processing on `Fruits.jpg` |
+| `Part1/` | Task 1: fruit detection, brightness experiments, supplied results and MATLAB analysis; see [Part1 instructions](Part1/README.md) |
 | `Part2/` | Task 2: regression network (`Task2.py`, `RegressionData.csv`, `InitialWeights.*`) |
 | `Part3/` | Open Exploration (Section C): `FinalMethod.py` (group final method, test 95.0 %, see `final_test_result.txt`), shared `data/`, `make_split.py`, `SPLIT_PROMPT.md`, `node_exploration.md` (summary of every method) |
 | `Part3/James L/` | Frozen pretrained encoders (DINOv2, VideoMAE) + LR / MLP |
@@ -35,6 +35,18 @@ Scripts load their data with relative paths, so run them from inside their folde
 cd Part2
 python Task2.py
 ```
+
+## Part 1: fruit detection
+
+```bash
+python Part1/Task1.py
+python Part1/WhatIf_Task1.py
+```
+
+The main demo defaults to `darkFactor=0.8`, `mirror=True`.
+Part 1 includes its input image, Python helpers, experiment results and a MATLAB
+four-panel analysis script. See [Part1/README.md](Part1/README.md) for the actual
+file layout, apple-stage image generation and MATLAB instructions.
 
 ## Part 3: the MLP classifier
 
