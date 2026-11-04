@@ -1,7 +1,7 @@
 # CODE MAP of extractors/both.py   (tree node: do speed and shaking together beat either alone?)
 #   Features        the 4 speed features (speed.py) followed by the 4 shaking features (shaking.py)
 #   Feature sets    "both"; load() -> {name: X (160, 8)}, NaN if either window is unusable
-#   AI use          GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light) (original code);
+#   AI use          GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light) (original code);; GitHub Copilot (VS Code; extension version, model/version and setting unavailable)
 #                   Claude Opus 5.5 (claude-opus-5-5), default setting (restructure)
 
 # %% Features

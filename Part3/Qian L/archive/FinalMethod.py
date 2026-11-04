@@ -2,7 +2,7 @@
 #   Freeze         bind train-selected method to code/data, refit 120 train clips
 #   Test           one formal run on 40 fixed clips, guarded against repetition
 #   Report         predictions, coverage, exact binomial interval and test
-#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
+#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light); GitHub Copilot (VS Code; extension version, model/version and setting unavailable)
 # Run from repository with its .venv\Scripts\python.exe:
 #   "Qian L/FinalMethod.py" --freeze     (no test extraction/prediction)
 #   "Qian L/FinalMethod.py" --run-test   (only AFTER method freeze)

@@ -2,7 +2,7 @@
 #   Fallback LR   FallbackLR: logistic regression on the clips whose features exist; a clip with no usable
 #                 motion (NaN features) gets the majority label of the training clips (tie -> light)
 #   Classifier    make(C): the classifier; C (L2 strength) is chosen on validation from {0.1, 1}
-#   AI use        GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light) (original code);
+#   AI use        GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light) (original code);; GitHub Copilot (VS Code; extension version, model/version and setting unavailable)
 #                 Claude Opus 5.5 (claude-opus-5-5), default setting (restructure)
 
 # %% Fallback LR

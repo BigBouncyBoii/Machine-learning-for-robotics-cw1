@@ -3,7 +3,7 @@
 #   Validation     three trials, two C values per trial; leave one person out
 #   History        match original video identities to old artifacts, no test images
 #   Output         per-video predictions, folds, objects and proposed method
-#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
+#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light); GitHub Copilot (VS Code; extension version, model/version and setting unavailable)
 # Run from repository: .venv\Scripts\python.exe "Part3/Qian L/explore.py"
 # Optional: --history-root PATH (old TaskC_2510); no formal test is run.
 # %% Inputs

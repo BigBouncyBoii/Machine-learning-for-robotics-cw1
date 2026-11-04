@@ -1,6 +1,6 @@
 # CODE MAP of run_validation_and_plot.py
 #   Run            validate three trials from train caches, verify, then plot
-#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
+#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light); GitHub Copilot (VS Code; extension version, model/version and setting unavailable)
 # Run from the repo root: python "Part3/Qian L/run_validation_and_plot.py"
 # Or: .venv\Scripts\python.exe "Part3/Qian L/run_validation_and_plot.py"
 # %% Run
