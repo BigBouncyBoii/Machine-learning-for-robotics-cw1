@@ -30,8 +30,8 @@ Paths are resolved from each script, so these scripts also work from other worki
 and sweeps dark factors from 1.00 to 0.10 in steps of 0.05, writing 57 records
 and the figures to `Task1_Whatif_Results/`.
 
-The apple-stage script currently writes regenerated images to `apple_stage_results/`;
-the supplied copies are stored in `Task1_Apple_Stage_Results/`.
+The apple-stage script writes regenerated images to `Task1_Apple_Stage_Results/`,
+the same folder as the supplied copies.
 
 ## MATLAB analysis
 

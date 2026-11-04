@@ -5,7 +5,7 @@
 #   and largest-connected-region selection in sequence.
 # - Stage comparison: displays the darkened image and three processing masks in
 #   a 2x2 figure, with bounding boxes around non-empty mask regions.
-# - Image saving: saves one comparison PNG per brightness level in apple_stage_results.
+# - Image saving: saves one comparison PNG per brightness level in Task1_Apple_Stage_Results.
 #
 # AI use: GPT6 Astra
 
@@ -32,7 +32,7 @@ ratio = 0.50
 # Create output folder
 output_folder = os.path.join(
     Path(__file__).resolve().parent,
-    "apple_stage_results"
+    "Task1_Apple_Stage_Results"
 )
 os.makedirs(output_folder, exist_ok=True)
 
