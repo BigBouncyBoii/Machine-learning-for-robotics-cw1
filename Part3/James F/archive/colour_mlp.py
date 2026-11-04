@@ -8,7 +8,7 @@
 #   Validation       leave-one-person-out on the training people, MLP vs logistic regression, per input
 #   Test             train the chosen input + model on all training people, evaluate once on the test person
 #   Plots            input/output example (frame with patches, colour curve, firm probability), validation bars
-#   AI use           Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use           Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # IDEA  A firm grip pushes blood out of the fingertips (blanching), so nail and finger colour change over
 #       the clip in a way that depends on grip force. MediaPipe only says WHERE the fingers are; the light/firm

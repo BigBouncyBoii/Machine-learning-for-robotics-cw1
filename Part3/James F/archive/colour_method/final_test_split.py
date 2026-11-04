@@ -5,7 +5,7 @@
 #   Fit           refit the chosen pipeline (imputer + scaler + 10-MLP ensemble, seeds fixed) on all 120 train clips
 #   Test          predict the 40 test clips once: accuracy, 95 % CI, p vs 50 %, per person / object, confusion matrix
 #   Save          group_split/test_report.txt, test_predictions.csv
-#   AI use        Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use        Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # HOW TO RUN (from the repo root), ONCE, after validate_split.py and only when the method is final:
 #   .venv\Scripts\python "Part3\James F\colour_method\final_test_split.py"

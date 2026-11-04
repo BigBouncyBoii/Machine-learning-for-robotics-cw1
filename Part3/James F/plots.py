@@ -1,7 +1,7 @@
 # CODE MAP of plots.py   (figures for the report; called by main.py --figures)
 #   Validation bars   validation_bars(): mean leave-one-person-out accuracy of every version in results/validation.csv
 #   Redness curves    redness_curves(): mean hand / nail a* over the clip, light vs firm, TRAIN clips only
-#   AI use            Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use            Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 
 # %% Validation bars
 import matplotlib.pyplot as plt

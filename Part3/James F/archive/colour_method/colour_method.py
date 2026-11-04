@@ -11,7 +11,7 @@
 #                    choose input + MLP penalty by validation log loss, train on all three,
 #                    test once on test_person, save one image
 #                    per test grip in figures/test_<person>/ and the validation bar chart
-#   AI use           Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use           Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # IDEA  A firm grip pushes blood out of the fingertips (blanching), so nail and finger colour change over
 #       the clip in a way that depends on grip force. MediaPipe only says WHERE the fingers are; the light/firm

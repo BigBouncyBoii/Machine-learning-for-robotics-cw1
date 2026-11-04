@@ -1,3 +1,4 @@
+# AI use: Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 # Set up
 import os
 import pandas as pd

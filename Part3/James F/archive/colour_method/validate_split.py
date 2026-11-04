@@ -5,7 +5,7 @@
 #                 every input x model from colour_method; imputer + scaler + classifier fitted inside each fold
 #   Choose        lowest mean validation LOG LOSS among the MLP ensembles (logistic regression = baseline only)
 #   Save          validation table -> group_split/validation.csv, choice -> group_split/choice.json
-#   AI use        Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use        Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # HOW TO RUN (from the repo root)
 #   .venv\Scripts\python "Part3\James F\colour_method\validate_split.py"

@@ -1,6 +1,6 @@
 # CODE MAP of classifiers/mlp.py
 #   Classifier   make(): one small MLP (16 hidden units, Adam), the first neural-network node
-#   AI use       Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use       Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # With ~90 training clips per fold one MLP depends a lot on its random starting weights;
 # mlp_ensemble.py was the next node because of that.

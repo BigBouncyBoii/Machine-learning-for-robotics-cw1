@@ -1,7 +1,7 @@
 # CODE MAP of classifiers/mlp_ensemble.py
 #   Ensemble     EnsembleMLP: 10 MLPs that differ only in their starting weights, probabilities averaged
 #   Classifier   make(): the ensemble with L2 penalty alpha
-#   AI use       Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use       Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # With ~90 training clips one MLP depends a lot on where it starts; averaging 10 removes that luck.
 # lbfgs (full-batch quasi-Newton) is the usual solver for small data sets: it converges properly.

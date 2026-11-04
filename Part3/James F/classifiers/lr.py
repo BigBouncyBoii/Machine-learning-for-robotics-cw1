@@ -1,6 +1,6 @@
 # CODE MAP of classifiers/lr.py
 #   Classifier   make(): logistic regression, the linear baseline of every node
-#   AI use       Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use       Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 
 # %% Classifier
 from sklearn.linear_model import LogisticRegression

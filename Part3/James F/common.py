@@ -5,7 +5,7 @@
 #   Hand tracker   hand_tracker(): pretrained MediaPipe hand landmarker in video mode (nothing is trained here)
 #   Pipeline       make_pipeline(): imputer + scaler + classifier; fitted on training clips only
 #   Validation     validate(): leave-one-person-out on the 120 TRAIN clips; the 40 test clips are never touched
-#   AI use         Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use         Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 
 # %% Paths
 import hashlib

@@ -8,7 +8,7 @@
 #   Validation      leave-one-person-out on the training people only, logistic regression, per feature set
 #   Test            train the chosen feature set on all training people, evaluate once on the test person
 #   Plots           redness over normalised time (light vs firm), per-clip change in a* by object
-#   AI use          Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use          Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # IDEA  Squeezing hard pushes blood out of the fingertips and nail beds, so they go paler / less red
 #       (blanching). Lab a* is the red-green axis: a firm grip should lower a* from rest to hold.

@@ -58,4 +58,4 @@ On Linux/WSL, MediaPipe also needs `sudo apt install libgles2`.
 MLP numbers can differ by one clip between Windows and Linux (floating point in the lbfgs solver).
 The numbers above are from Linux; the logistic regression numbers are identical on both.
 
-AI use: Claude Opus 5.5 (`claude-opus-5-5`), default setting.
+AI use: Claude Opus 5.5 (`claude-opus-5-5`), GPT-6 Astra and GPT-6.1 Sol, all at the Medium setting.

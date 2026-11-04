@@ -2,7 +2,7 @@
 #   Settings   which person is held out
 #   Run        colour_method.run(): validation on people A, B, C only, choose input + model,
 #              train on A, B, C, test once on person D, save one image per test grip in figures/test_D/
-#   AI use     Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use     Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # HOW TO RUN (from the repo root)
 #   .venv\Scripts\python "Part3\James F\colour_method\test_D.py"

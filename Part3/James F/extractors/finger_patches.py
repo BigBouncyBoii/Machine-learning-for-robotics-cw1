@@ -5,7 +5,7 @@
 #   Clip curves      every frame of every clip, cached in cache/finger_patches.npz (no labels used)
 #   Change curves    per clip: colour change from rest, averaged into 10 time bins -> (10 bins, 10 patches, 3)
 #   Feature sets     FEATURE_SETS: the four inputs compared in the tree; load() -> {name: X (160, d)}
-#   AI use           Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use           Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # IDEA  Same blanching idea as hand_colour.py, but per finger and as a time course: the whole hand mixes
 #       fingers that press with ones that do not, and one hold window throws the timing away.

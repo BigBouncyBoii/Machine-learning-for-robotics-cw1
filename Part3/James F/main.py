@@ -5,7 +5,7 @@
 #   Save          rows merged into results/validation.csv (one row per node version, re-runs overwrite)
 #   Test          --test, ONCE, one version: train on all 120 train clips, predict the 40 test clips
 #   Figures       --figures: validation bars and redness-over-time curves (plots.py)
-#   AI use        Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use        Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # HOW TO RUN (from anywhere, venv activated; first run builds the caches from data/videos_480p, ~15 min)
 #   python "Part3/James F/main.py"                                    # validate every node (test clips not used)

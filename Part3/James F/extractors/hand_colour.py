@@ -4,7 +4,7 @@
 #   Clip curves     every frame of every clip, cached in cache/colour_curves.npz (no labels used)
 #   Clip features   rest (hand reaching in) vs hold (object lifted) -> hold value and hold-minus-rest change
 #   Feature sets    FEATURE_SETS: the six versions compared in the tree; load() -> {name: X (160, d)}
-#   AI use          Claude Opus 5.5 (claude-opus-5-5), default setting
+#   AI use          Claude Opus 5.5 (claude-opus-5-5), GPT-6 Astra, GPT-6.1 Sol; all Medium setting
 #
 # IDEA  Squeezing hard pushes blood out of the fingertips and nail beds, so they go paler / less red
 #       (blanching). Lab a* is the red-green axis: a firm grip should lower a* from rest to hold.
