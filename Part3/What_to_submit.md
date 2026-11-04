@@ -88,7 +88,7 @@ How it's scored: 1 = done and result reported; 2 = also, test set not used for t
 | Input/output figure of the final method | **Still to do / confirm** |
 | Data-count table (per person / object / label) | **Still to do** (10 per person/object/label; train 30 / test 10 per person) |
 | Code maps with an AI-use line in every file | `Jeevan/FingerAnglesJeevan.py` still has a placeholder AI-use line |
-| Extension (A or B) | **Not started.** Without it the max is 16/19 |
+| Extension (A or B) | Done: B, mask ablation (hand removed / hand only × retrained / test only), `Extension/mask_ablation.py`, `Extension/results/mask_ablation.csv`, figures in `Extension/figures/` |
 | Videos left out of the zip | **Watch out:** `data/videos_480p/*.mp4` (160 clips) are *tracked in git* so the team can share them. Don't zip the repo as-is; leave `data/videos*/` and the raw `ELEC0144_Video*.zip` out |
 | Saved data the code needs, in the zip | `Part3/*/features/` (James L's cached features, which `FinalMethod.py` needs) is git-ignored, so add it by hand. Also include `James F/cache/*.npz`, `data/labels.csv` and `data/split.csv` |
 
@@ -96,3 +96,38 @@ How it's scored: 1 = done and result reported; 2 = also, test set not used for t
 - **Test clips seen earlier:** some of the 40 test clips were used in older protocols, in James F's person-held-out runs and in Qian L's old split (`Qian L/results/historical_exposure.csv`). Say so, and don't call the test set "never seen".
 - **Qian L's shaking result depends on the environment:** re-run on a different machine (different OpenCV build), it gave 60.8% instead of 62.5%. Quote the committed number and say where it came from.
 - **James F chose by log loss:** the chosen input (nail + mid Lab curves, MLP) isn't the one with the highest validation accuracy (the a* curve with LR got 70.0%). The selection rule was validation log loss over the MLPs.
+
+---
+
+## Pre-submission checklist (checked 2026-11-04)
+
+### Must fix
+- [ ] **AI-use lines with placeholders.** Each one needs the model, version and setting:
+  - `Jeevan/archive/FingerAnglesJeevan.py:9`: `<name your AI model, version and setting here>`
+  - `Jeevan/main.py`, `Jeevan/plots.py`, `Jeevan/extractors/joint_angles.py`: `<Jeevan: model, version, setting>`
+  - `Qian L/classifiers/lr.py`, `Qian L/plots.py`, `Qian L/extractors/{both,motion,shaking,speed}.py`: `<Qian L to fill in>`
+- [ ] **No code map or AI-use line:** `James F/Task1_early/Function_A.py`, `Function_B.py`, `Main.py`, `Main_Repeated.py`. Add a header, or leave the folder out if nothing reported uses it.
+- [ ] **Part 1 AI lines say only "GPT6 Astra".** Add a version and setting, or write "version/setting unavailable".
+- [ ] **`SPLIT_PROMPT.md` and `tree.mmd` are deleted in the working tree but not committed.** Check this was intended. `tree.mmd` is the source of `tree.png`.
+
+### Leave out of the zip
+| What | Size | Why |
+|---|---|---|
+| `ELEC0144_video{A,B,C,D}.zip` | 3.2 GB | Raw videos aren't allowed |
+| `data/videos/` and `data/videos_480p/` | 3.1 GB + 44 MB | No videos |
+| `Extension/videos/*.mp4` | 4 MB | No videos |
+| `.venv/`, all `__pycache__/` | | Environment files |
+| `Qian L/archive/cache_speed_shaking_v2/` | | Old caches keyed by absolute paths |
+| `What_to_submit.md` (this file) | | Internal checklist |
+| `Assignment_Files_Draft37*`, `Brief/` | | The assignment brief itself |
+
+### Make sure these are in the zip
+- [ ] **`James L/cache/`**: git-ignored, but `FinalMethod.py` and `Extension/mask_ablation.py` need it. A fresh `git clone` will **not** have it; zip from a working copy that does, or copy it in by hand.
+- [ ] `data/labels.csv`, `data/split.csv`
+- [ ] `Extension/cache/*.npz`, `James F/cache/`, `Jeevan/cache/`, `Qian L/cache/` (tracked in git)
+- [ ] `FinalMethod.py` and `final_test_result.txt`
+
+### Already fine
+- Every other Part 3 `.py` file has a code map ending in an AI-use line.
+- No absolute paths in the code.
+- The Extension features are cached, so `mask_ablation.py` rebuilds the table without the videos.
