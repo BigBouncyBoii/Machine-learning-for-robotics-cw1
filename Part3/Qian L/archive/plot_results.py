@@ -4,7 +4,7 @@
 #   Confusion      one confusion matrix per trial, validation predictions only
 #   Features       raw train feature distributions, no classifier tuning
 #   Output         reproducible PNG/SVG figures and source data tables
-#   AI use         GPT-6 (Codex); exact version/settings unavailable
+#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 # Run: .venv\Scripts\python.exe "Part3/Qian L/plot_results.py"
 # %% Inputs
 from pathlib import Path

@@ -1,7 +1,7 @@
 # CODE MAP of plots.py   (figures for the report; called by main.py --figures)
 #   Overview        validation_overview(): mean accuracy per node, accuracy per held-out person, accuracy per object
 #   Distributions   feature_distributions(): one speed and one shaking feature, light vs firm, TRAIN clips only
-#   AI use          GPT-6 (Codex), version/setting <Qian L to fill in> (original figures);
+#   AI use          GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light) (original figures);
 #                   Claude Opus 5.5 (claude-opus-5-5), default setting (restructure)
 
 # %% Overview

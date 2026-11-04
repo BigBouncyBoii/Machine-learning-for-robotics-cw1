@@ -3,7 +3,7 @@
 #   Velocity        the hand's velocity relative to the background, gaps of <= 2 frames filled, longer gaps rejected
 #   Features        FEATURES: 4 tremor numbers from that velocity (jitter around its smooth trend, reversals)
 #   Feature sets    "shaking"; load() -> {name: X (160, 4)}, NaN where the window is unusable
-#   AI use          GPT-6 (Codex), version/setting <Qian L to fill in> (original code);
+#   AI use          GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light) (original code);
 #                   Claude Opus 5.5 (claude-opus-5-5), default setting (restructure)
 
 # %% Window

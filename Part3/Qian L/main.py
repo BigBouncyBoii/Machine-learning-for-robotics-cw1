@@ -5,7 +5,7 @@
 #   Save          rows merged into results/validation.csv (one row per node version, re-runs overwrite)
 #   Test          --test, ONCE: the version chosen on validation, trained on all 120 train clips, predicts the 40 test clips
 #   Figures       --figures: validation overview and train feature distributions (plots.py)
-#   AI use        Claude Opus 5.5 (claude-opus-5-5), default setting (restructure)
+#   AI use        Claude Opus 5.5 (claude-opus-5-5), default setting (restructure); GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 #
 # HOW TO RUN (from anywhere, venv activated; clips missing from cache/ are decoded first, ~3 s each)
 #   python "Part3/Qian L/main.py"                              # all three nodes, C = 0.1 and 1 (test clips not used)

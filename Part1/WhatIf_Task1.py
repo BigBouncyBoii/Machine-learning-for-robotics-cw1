@@ -10,7 +10,7 @@
 # - Comparison figure: saves a 4x5 overview at 5 cm height as PNG and PDF.
 # - Data export: saves detection status and geometry from all runs to a CSV file.
 #
-# AI use: GPT6 Astra
+# AI use: GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 
 
 # Set up

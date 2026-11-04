@@ -5,7 +5,7 @@
 #   Diagnostics    eight fixed training representatives, no test images
 #   Freeze checks  temporary freeze/refit and repeated-test guard
 #   Evidence       save verification results
-#   AI use         GPT-6 (Codex); exact version/settings unavailable
+#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 # Run before formal test: .venv\Scripts\python.exe "Part3/Qian L/verify.py"
 # %% Inputs
 from pathlib import Path

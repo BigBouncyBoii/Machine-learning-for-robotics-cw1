@@ -2,7 +2,7 @@
 #   Window          WINDOW: the early part of the clip (10-45 %), when the fingers close on the object
 #   Features        FEATURES: 4 speed numbers, each the mean over the valid frame pairs of the window
 #   Feature sets    "speed"; load() -> {name: X (160, 4)}, NaN where the window has too little visible skin
-#   AI use          GPT-6 (Codex), version/setting <Qian L to fill in> (original code);
+#   AI use          GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light) (original code);
 #                   Claude Opus 5.5 (claude-opus-5-5), default setting (restructure)
 #
 # local speed  = optical flow of skin pixels minus the hand's median flow (fingers moving relative to the hand)

@@ -6,7 +6,7 @@
 # - plot_all: draws bounds, midpoint and moment centroid.
 # - calculate_MomentCentroid: calculates the binary-mask centroid.
 # - darker / mirror_image: darkens or horizontally flips an image.
-# AI use: GPT6 Astra
+# AI use: GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 
 import matplotlib.pyplot as plt
 import numpy as np

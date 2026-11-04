@@ -5,7 +5,7 @@
 # Calculation geometry: calculate bounding box and bounding box centroid, and calculate moment centroids
 # Plotting: plot the image with bounding box and centroids, and print the coordinates and distances of each fruit
 
-# AI use: GPT6 Astra
+# AI use: GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 
 # Set up
 import sys

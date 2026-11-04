@@ -2,7 +2,7 @@
 #   Protocol       validate immutable split, labels, counts, fingerprint and paths
 #   Evaluation     fold-local scaler/classifier and predeclared majority fallback
 #   Files          atomic JSON output and reproducibility hashes
-#   AI use         GPT-6 (Codex); exact version/settings unavailable
+#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 # Imported by explore.py and FinalMethod.py; no standalone command.
 # %% Protocol
 import hashlib

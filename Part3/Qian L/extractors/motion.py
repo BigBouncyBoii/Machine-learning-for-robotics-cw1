@@ -3,7 +3,7 @@
 #   Decode          every frame: Farneback optical flow, skin pixels in the region -> one motion sample per frame pair
 #   Cache           motion series of every clip (no labels used) -> cache/motion_series.json.gz
 #   Phase           phase(): the frame pairs inside a time window; enough_valid(): is that window usable?
-#   AI use          GPT-6 (Codex), version/setting <Qian L to fill in> (original code);
+#   AI use          GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light) (original code);
 #                   Claude Opus 5.5 (claude-opus-5-5), default setting (restructure)
 #
 # IDEA  A firm grip may close the fingers faster and make the hand shake more under strain. Both are motion,

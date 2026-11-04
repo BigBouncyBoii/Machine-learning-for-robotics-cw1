@@ -3,7 +3,7 @@
 #   Decode         every decoded frame, aspect-preserving skin and background flow
 #   Features       early nonrigid closing-speed proxy, later temporal shaking proxy
 #   Cache          label-free per-clip content/config/code hashes and atomic writes
-#   AI use         GPT-6 (Codex); exact version/settings unavailable
+#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 # Imported by explore.py / FinalMethod.py. Run those entry points, not this module.
 # %% Settings
 import hashlib

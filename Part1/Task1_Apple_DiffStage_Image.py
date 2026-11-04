@@ -7,7 +7,7 @@
 #   a 2x2 figure, with bounding boxes around non-empty mask regions.
 # - Image saving: saves one comparison PNG per brightness level in Task1_Apple_Stage_Results.
 #
-# AI use: GPT6 Astra
+# AI use: GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 
 
 # Set up
