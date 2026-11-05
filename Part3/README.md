@@ -5,7 +5,7 @@ Classify a short video of a hand gripping an object as a **light** or **firm** g
 **Group final method:** James L's DINOv2 middle frames + MLP ensemble, run by `FinalMethod.py`.
 **Test: 38/40 = 95.0 %** (guessing 50 %, one-sided binomial p = 7.5e-10), see `final_test_result.txt`.
 
-Every command below is run from the repo root with the venv activated (`pip install -r <member>/requirements.txt`).
+Every command below is run from the repo root with the venv activated (`pip install -r "Part3/<member>/requirements.txt"`).
 
 ---
 
@@ -31,8 +31,8 @@ Guessing = 50 % (light and firm are equally many in every fold).
 
 ## Exploration tree
 
-Draft: the main attempts and decisions, one line each. Initials: JL = James L, JF = James F, QL = Qian L, JE = Jeevan.
-Pick 5–15 nodes for the report; every number is a validation accuracy from the command in the next table.
+The main attempts and decisions, one line each. Initials: JL = James L, JF = James F, QL = Qian L, JE = Jeevan.
+Every number is a validation accuracy from the command in the next table.
 
 ```
 Question: can video tell a light grip from a firm grip?
@@ -52,8 +52,6 @@ Question: can video tell a light grip from a firm grip?
 └─ Joint angles, MediaPipe (JE): firm grips bend fingers more; val 59.2 %, hand in 42 % of frames → dropped
 Final method on test: DINOv2 middle 6 frames + 5-MLP ensemble, 38/40 = 95.0 % (guessing 50 %).
 ```
-
-Diagram of the same tree: `tree.mmd` → `tree.svg` / `tree.png`.
 
 **James L's nodes, notes for the viva:**
 - After the ensemble node, every JL number is the **ensemble**; before it, LR or single MLP (mean of 5 seeds).
@@ -202,6 +200,33 @@ A firm grip bends the fingers more and holds them more steadily.
 
 ---
 
+## Extension B: mask ablation (`Extension/`)
+
+What does the final method rely on, the hand or the rest of the frame? The hand is found by a YCrCb skin-colour
+threshold and either painted the wall colour (**hand removed**) or kept alone (**hand only**). Each mask is run two ways:
+**retrained** (new MLP ensemble on the masked train clips) and **test only** (the unchanged final model on the masked test clips).
+The 40 test clips are never used for training.
+
+| Input | Mode | Validation | Test | Hard | Soft | p vs guessing |
+|---|---|---|---|---|---|---|
+| Original (final method) | - | 75.0 % | **95.0 %** | 95 % | 95 % | 7.5e-10 |
+| Hand removed | retrained | 66.7 % | 87.5 % | 80 % | 95 % | 6.9e-7 |
+| Hand removed | test only | - | 72.5 % | 75 % | 70 % | 0.003 |
+| Hand only | retrained | 65.0 % | 92.5 % | 95 % | 90 % | 9.7e-9 |
+| Hand only | test only | - | 57.5 % | 60 % | 55 % | 0.21 |
+
+- The final model uses both the hand and the rest of the frame, but leans more on the rest (object, sleeve).
+- The hand alone still carries the signal (92.5 % retrained); the final model just didn't learn to use it.
+- With the hand removed, the soft object stays at 95 % (the toy deforms) but the hard object drops to 80 %.
+
+```
+python Part3/Extension/mask_ablation.py     # table -> Extension/results/mask_ablation.csv (masked features cached)
+python Part3/Extension/plot_ablation.py     # -> Extension/figures/mask_ablation_results.png
+python Part3/Extension/plot_table.py        # -> Extension/figures/mask_ablation_table.png
+```
+
+---
+
 ## Files in `Part3/`
 
 | File | What it is |
@@ -210,5 +235,7 @@ A firm grip bends the fingers more and holds them more steadily.
 | `final_test_result.txt` | Its output (run once) |
 | `make_split.py` | Made `data/split.csv` once; never run again |
 | `data/labels.csv`, `data/split.csv` | The clip list and the fixed split |
-| `What_to_submit.md` | Checklist from the brief |
-| `SPLIT_PROMPT.md` | The protocol prompt every member gave their AI tool (not submitted) |
+| `final_method_figure.py` | Report figure: input frames and output P(firm) → `figures/final_method_io.png` |
+| `method_diagram.py` | Report figure: frames → DINOv2 → MLP → output → `figures/method_pipeline.png` |
+| `Extension/` | Extension B, the mask ablation (above) |
+| `James F/`, `James L/`, `Jeevan/`, `Qian L/` | Each member's branch (above) |
