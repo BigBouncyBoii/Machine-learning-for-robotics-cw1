@@ -1,13 +1,13 @@
-# Code map:
-# Setting: import libraries and files, set parameters-darkFactor, mirror, window_size and ratio
-# Loading_data:  image_fruits, process the image with darkFactor and mirror, then read RGB files of each pixel
-# Pre-processing:   color filter, scatter filter, keep the largets connected region
-# Calculation geometry: calculate bounding box and bounding box centroid, and calculate moment centroids
-# Plotting: plot the image with bounding box and centroids, and print the coordinates and distances of each fruit
+# CODE MAP of Task1.py
+#   Set up         import libraries and Task1_functions, path to Fruits.jpg
+#   Settings       darkFactor, mirror, window_size (scatter filter window), ratio (scatter filter threshold)
+#   Load image     read Fruits.jpg, darken by darkFactor (rounded to 8 bits), mirror if requested
+#   Masks          per fruit: colour filter -> scatter filter -> keep largest connected region
+#   Geometry       bounding box and its midpoint, moment centroid, distance between the two; printed
+#   Plot results   image with each fruit's box, box midpoint (o) and moment centroid (x)
+#   AI use         GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 
-# AI use: GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
-
-# Set up
+# %% Set up
 import sys
 from pathlib import Path
 
@@ -20,20 +20,20 @@ image_path = Path(__file__).resolve().parent / "Fruits.jpg"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import Task1_functions as fn
 
-#settings
-#parameters
+# %% Settings
 darkFactor = 0.8
 mirror = True
 window_size = 5
 ratio = 0.5
 
+# %% Load image
 image_fruits = plt.imread(image_path)
 if (mirror == True): 
     image_fruits = fn.mirror_image(fn.darker(image_fruits, darkFactor))
 else:
     image_fruits = fn.darker(image_fruits, darkFactor)
     
-#pre-processing
+# %% Masks
 R = image_fruits[:, :, 0]
 G = image_fruits[:, :, 1]
 B = image_fruits[:, :, 2]
@@ -44,6 +44,7 @@ for fruit in ('apple', 'capsicum', 'lemon'):
     clean_mask = fn.scatter_filter(mask, window_size, ratio)
     fruit_masks[fruit] = fn.keep_largest_region(clean_mask)
 
+# %% Geometry
 fruit_data = {}
 print(f'darkFactor = {darkFactor:.2f}, mirror = {mirror}')
 print('Coordinates: x rightwards, y downwards; distances in pixels.')

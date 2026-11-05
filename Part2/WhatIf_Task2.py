@@ -11,7 +11,7 @@
 #   Plots          fit on xtest, both learning curves on one figure, printed errors
 #   AI use         Claude Opus 5.5 (claude-opus-5-5), default setting
 #
-# HOW TO RUN (from the folder holding this file and the data files)
+# HOW TO RUN (from any folder: data files are found next to this file)
 #   python3 -m venv .venv
 #   source .venv/bin/activate        (Windows: .venv\Scripts\activate)
 #   pip install numpy pandas matplotlib
@@ -22,6 +22,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+
+HERE = os.path.dirname(os.path.abspath(__file__))   # folder of this file: data in, figures out
 
 ETA = 0.1            # SGD learning rate
 N_EPOCHS = 3000
@@ -34,10 +36,11 @@ BETA2 = 0.999
 EPS = 1e-8
 
 OUT_DIR = "results_forgotten_derivative"
+OUT_DIR = os.path.join(HERE, OUT_DIR)
 os.makedirs(OUT_DIR, exist_ok=True)
 
 # %% Load data
-df = pd.read_csv("RegressionData.csv")
+df = pd.read_csv(os.path.join(HERE, "RegressionData.csv"))
 x, d = df["x"].values, df["d"].values          # (41,), (41,)
 
 xtest = np.linspace(-0.97, 0.93, 20)
@@ -46,7 +49,7 @@ xtest = np.linspace(-0.97, 0.93, 20)
 def reset_weights():
   """Set W1, b1, W2, b2 back to the given starting weights."""
   global W1, b1, W2, b2
-  w = np.load("InitialWeights.npz")
+  w = np.load(os.path.join(HERE, "InitialWeights.npz"))
   W1, b1 = w["W1r"], w["b1r"]                  # (3,1), (3,1)
   W2, b2 = w["W2r"], w["b2r"]                  # (1,3), (1,1)
 

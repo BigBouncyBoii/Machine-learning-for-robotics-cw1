@@ -9,7 +9,7 @@
 #   Plots          fit on xtest, both learning curves on one figure, printed errors
 #   AI use         Claude Opus 5.5 (claude-opus-5-5), default setting
 #
-# HOW TO RUN (from the folder holding this file and the data files)
+# HOW TO RUN (from any folder: data files are found next to this file)
 #   python3 -m venv .venv
 #   source .venv/bin/activate        (Windows: .venv\Scripts\activate)
 #   pip install numpy pandas matplotlib
@@ -30,6 +30,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+HERE = os.path.dirname(os.path.abspath(__file__))   # folder of this file: data in, figures out
+
 ETA = 0.1            # SGD learning rate: how big each step is
 N_EPOCHS = 3000      # 1 epoch = one pass through all 41 training points
 SEED = 67            # fixes the random shuffle order, so every run gives the same result
@@ -42,10 +44,11 @@ BETA2 = 0.999        # how much ADAM remembers past squared gradients (the avera
 EPS = 1e-8           # tiny number so we never divide by zero
 
 OUT_DIR = "results_normal"           # folder where the figures are saved
+OUT_DIR = os.path.join(HERE, OUT_DIR)
 os.makedirs(OUT_DIR, exist_ok=True)
 
 # %% Load data
-df = pd.read_csv("RegressionData.csv")
+df = pd.read_csv(os.path.join(HERE, "RegressionData.csv"))
 x, d = df["x"].values, df["d"].values          # x = inputs, d = desired outputs (41 each)
 
 xtest = np.linspace(-0.97, 0.93, 20)           # 20 new x values, used only to plot the trained curve
@@ -55,7 +58,7 @@ def reset_weights():
   """Set W1, b1, W2, b2 back to the given starting weights."""
   # Both SGD and ADAM start from these same weights, so the comparison is fair.
   global W1, b1, W2, b2
-  w = np.load("InitialWeights.npz")
+  w = np.load(os.path.join(HERE, "InitialWeights.npz"))
   W1, b1 = w["W1r"], w["b1r"]                  # input -> hidden: 3 weights, 3 biases
   W2, b2 = w["W2r"], w["b2r"]                  # hidden -> output: 3 weights, 1 bias
 

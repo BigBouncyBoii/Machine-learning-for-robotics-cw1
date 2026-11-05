@@ -1,12 +1,16 @@
-% Code map:
-% - Data loading: reads the fruit detection CSV from Task1_Whatif_Results.
-% - Geometry: calculates bounding-box width, height and area (width times height).
-% - Fruit comparison: groups apple, capsicum and lemon records and sorts by dark factor.
-% - Plotting: creates a 2x2 figure showing box width, box height, centroid distance
-%   and bounding-box area against dark factor.
-% - Formatting: applies axis labels, panel titles, a shared legend and report styling.
-%
-% AI use: GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
+% CODE MAP of Task1_Whatif_DataAnalysis.m (four-panel plot of the darkening What-if)
+%   Read data                     read Task1_Whatif_Results/fruit_detection_data_mirror_False.csv;
+%                                 box width, height and area (width x height)
+%   Figure size for an A4 report  figure and 2x2 layout size
+%   Axes formatting               fonts, grid and line styles shared by all panels
+%   Plot each fruit               apple, capsicum, lemon sorted by dark factor: width, height,
+%                                 centroid distance and box area against dark factor
+%   Panel titles and labels       titles and axis labels of the four panels
+%   Axis limits                   x from 1.0 down to 0.1, y limits per panel
+%   Shared legend                 one legend for the three fruits
+%   Main title                    figure title
+%   Extra-large, bold formatting  final text sizes for the report
+%   AI use                        GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 
 clear;
 clc;

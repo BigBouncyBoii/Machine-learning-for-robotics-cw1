@@ -1,17 +1,18 @@
-# Code map:
-# - fruit_color_filter: creates a colour mask for the selected fruit.
-# - scatter_filter: removes pixels with insufficient local support.
-# - keep_largest_region: retains the largest connected component.
-# - calculate_BoundingBox_and_Centroid: finds bounds and their midpoint.
-# - plot_all: draws bounds, midpoint and moment centroid.
-# - calculate_MomentCentroid: calculates the binary-mask centroid.
-# - darker / mirror_image: darkens or horizontally flips an image.
-# AI use: GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
+# CODE MAP of Task1_functions.py (helpers imported by Task1.py, WhatIf_Task1.py, Task1_Apple_DiffStage_Image.py)
+#   Colour filter          fruit_color_filter: RGB-ratio mask for apple, capsicum or lemon
+#   Scatter filter         scatter_filter: keep a pixel only if >= ratio of its window is also in the mask
+#   Largest region         keep_largest_region: flood fill (8-connected), keep the biggest region
+#   Bounding box           calculate_BoundingBox_and_Centroid: box limits and box midpoint
+#   Plot                   plot_all: draw box, box midpoint and moment centroid
+#   Moment centroid        calculate_MomentCentroid: M10/M00, M01/M00 of the binary mask
+#   Darken and mirror      darker (multiply, round to 8 bits), mirror_image (flip left-right)
+#   AI use                 GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 
+# %% Imports
 import matplotlib.pyplot as plt
 import numpy as np
 
-# fnA1: color filter
+# %% Colour filter
 def fruit_color_filter(fruit, image):
 
     # Separate RGB values
@@ -53,7 +54,7 @@ def fruit_color_filter(fruit, image):
 
     return mask, ColorFiltered_image
 
-# fnA2: scatter filter
+# %% Scatter filter
 def scatter_filter(mask, window_size, ratio):
 
     # Window size must be a positive odd integer
@@ -89,7 +90,7 @@ def scatter_filter(mask, window_size, ratio):
 
     return clean_mask
 
-# fnA3：Area filter keep the largest region
+# %% Largest region
 def keep_largest_region(mask):
 
     height, width = mask.shape
@@ -135,7 +136,7 @@ def keep_largest_region(mask):
 
 
 
-#fn4: Calculate bounding box and centroid
+# %% Bounding box
 #example of using the func in main code
 #fruit_boundingbox_data = {
 #    "apple": fn.calculate_geometry(largest_mask_apple),
@@ -161,7 +162,7 @@ def calculate_BoundingBox_and_Centroid(mask):
     }
 
 
-#fn5: plot bounding box and centroids(both bounding box and moment centroids)
+# %% Plot
 def plot_all(geometry, name, color):
 
     if geometry is None:
@@ -215,7 +216,7 @@ def plot_all(geometry, name, color):
 
 
 
-#fn6: find the centroid using the moment method
+# %% Moment centroid
 def calculate_MomentCentroid(mask):
 
     # Binary image: selected pixels = 1, others = 0
@@ -241,7 +242,8 @@ def calculate_MomentCentroid(mask):
         "center_y_m": float(center_y_m)
     }
 
-#fnA7: Darken a uint8 image, round and convert back to 8 bits
+# %% Darken and mirror
+# Darken a uint8 image, round and convert back to 8 bits
 def darker(image, darkFactor):
 
     darkened = image.astype(float) * darkFactor

@@ -5,7 +5,7 @@
 #   Save          rows merged into results/validation.csv (one row per node version, re-runs overwrite)
 #   Test          --test, ONCE, one version: train on all 120 train clips, predict the 40 test clips
 #   Figures       --figures: accuracy per held-out person and pooled validation confusion matrix (plots.py)
-#   AI use        Claude Opus 5.5 (claude-opus-5-5), default setting (restructure); original code: <Jeevan: model, version, setting>
+#   AI use        Claude Opus 5.5 (claude-opus-5-5), default setting (restructure); original code: Claude Opus 5.5 (claude-opus-5-5), default setting
 #
 # HOW TO RUN (from anywhere, venv activated; the first run builds cache/ from data/videos_480p, ~10 min)
 #   python Part3/Jeevan/main.py                     # validate (test clips not used)

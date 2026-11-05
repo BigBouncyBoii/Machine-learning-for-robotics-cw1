@@ -1,7 +1,7 @@
 # CODE MAP of plots.py   (figures for the report; called by main.py --figures)
 #   Per person    per_person(): validation accuracy for each held-out person, mean and guessing lines
 #   Confusion     confusion(): pooled leave-one-person-out predictions of the 120 train clips
-#   AI use        Claude Opus 5.5 (claude-opus-5-5), default setting (restructure); original code: <Jeevan: model, version, setting>
+#   AI use        Claude Opus 5.5 (claude-opus-5-5), default setting (restructure); original code: Claude Opus 5.5 (claude-opus-5-5), default setting
 
 # %% Per person
 import matplotlib.pyplot as plt

@@ -1,19 +1,14 @@
-# Code map:
-# - Setup: imports libraries, configures filtering and mirroring, and loads the image.
-# - Brightness loop: applies darkFactor values from 1.00 to 0.10 in steps of 0.05.
-# - Fruit detection: applies colour and scatter filters and keeps the largest region
-#   for each apple, capsicum and lemon mask using Task1_functions.
-# - Geometry: calculates bounding boxes, bounding-box midpoints, moment centroids
-#   and distances between the two centres; records failed detections as missing data.
-# - Plotting and image saving: overlays geometry and centroid distances and saves
-#   one annotated PNG for each brightness level in Task1_Whatif_Results.
-# - Comparison figure: saves a 4x5 overview at 5 cm height as PNG and PDF.
-# - Data export: saves detection status and geometry from all runs to a CSV file.
-#
-# AI use: GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
+# CODE MAP of WhatIf_Task1.py (What-if: darkening; settings as in Task1.py, not retuned)
+#   Set up               import libraries and Task1_functions, path to Fruits.jpg
+#   Settings             mirror, window_size, ratio; output folder Task1_Whatif_Results
+#   Brightness loop      darkFactor 1.00 -> 0.10 in steps of 0.05; per fruit: colour filter, scatter
+#                        filter, largest region, box, both centroids and their distance (missing if lost)
+#   Plot results         per darkFactor: annotated image saved as fruits_dark_<f>_mirror_<m>.png
+#   Save data            all detections to fruit_detection_data_mirror_<m>.csv
+#   Comparison figure    4x5 overview of all dark factors, 5 cm high, PNG and PDF
+#   AI use               GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 
-
-# Set up
+# %% Set up
 import os
 import sys
 from pathlib import Path
@@ -31,7 +26,7 @@ import Task1_functions as fn
 
 image_path = Path(__file__).resolve().parent / "Fruits.jpg"
 
-# Settings
+# %% Settings
 mirror = False
 window_size = 5
 ratio = 0.50
@@ -49,6 +44,7 @@ original_image = plt.imread(image_path)
 # Collect data from all runs
 all_results = []
 
+# %% Brightness loop
 # Run darkFactor from 1.00 to 0.10, decreasing by 0.05
 for step in range(20, 1, -1):
     darkFactor = step / 20
@@ -144,7 +140,7 @@ for step in range(20, 1, -1):
             f"{geometry['centroid_distance']:.2f} pixels"
         )
 
-    # Plot results
+    # %% Plot results
     fig, ax = plt.subplots(figsize=(12, 9))
     ax.imshow(image_fruits)
 
@@ -217,7 +213,7 @@ for step in range(20, 1, -1):
 
     print(f"Saved image: {save_path}")
 
-# Save collected data as CSV
+# %% Save data
 results_table = pd.DataFrame(all_results)
 
 csv_path = os.path.join(
@@ -234,6 +230,7 @@ results_table.to_csv(
 print(f"\nData saved: {csv_path}")
 print("Finished: 19 images and 57 data records saved.")
 
+# %% Comparison figure
 # Compact overview: dimensions and line widths are set for a 5 cm high figure.
 overview_height_cm = 5.0
 fig, axes = plt.subplots(4, 5, figsize=(8.0 / 2.54, overview_height_cm / 2.54))

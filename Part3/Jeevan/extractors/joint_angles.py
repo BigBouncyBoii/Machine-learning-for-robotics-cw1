@@ -5,7 +5,7 @@
 #   Hand model      download the official MediaPipe hand landmarker once; image mode, 1 hand
 #   Cache           every clip once (no labels used) -> cache/joint_angles.npz
 #   Feature sets    "joint_angles": the 46 features; load() -> {name: X (160, 46)}
-#   AI use          Claude Opus 5.5 (claude-opus-5-5), default setting (restructure); original code: <Jeevan: model, version, setting>
+#   AI use          Claude Opus 5.5 (claude-opus-5-5), default setting (restructure); original code: Claude Opus 5.5 (claude-opus-5-5), default setting
 #
 # IDEA  A firm grip bends the fingers more and holds them more steadily, which should be visible in the pose.
 #       (was FingerAnglesJeevan.py)

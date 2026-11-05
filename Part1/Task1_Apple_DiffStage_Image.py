@@ -1,16 +1,13 @@
-# Code map:
-# - Setup: imports libraries, configures filtering and mirroring, and loads the image.
-# - Brightness loop: applies darkFactor values from 1.00 to 0.10 in steps of 0.05.
-# - Apple filtering: uses Task1_functions to apply colour filtering, scatter filtering
-#   and largest-connected-region selection in sequence.
-# - Stage comparison: displays the darkened image and three processing masks in
-#   a 2x2 figure, with bounding boxes around non-empty mask regions.
-# - Image saving: saves one comparison PNG per brightness level in Task1_Apple_Stage_Results.
-#
-# AI use: GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
+# CODE MAP of Task1_Apple_DiffStage_Image.py (apple at each processing stage, for the report)
+#   Set up             import libraries and Task1_functions, path to Fruits.jpg
+#   Settings           mirror, window_size, ratio; output folder Task1_Apple_Stage_Results
+#   Brightness loop    darkFactor 1.00 -> 0.10 in steps of 0.05
+#   Apple filtering    colour filter -> scatter filter -> largest connected region
+#   Stage comparison   2x2 figure: darkened image and the three masks, with their boxes
+#   Save image         one PNG per darkFactor
+#   AI use             GPT-6.1 Sol (setting: medium); GPT-6 Astra (setting: light)
 
-
-# Set up
+# %% Set up
 import os
 import sys
 from pathlib import Path
@@ -24,7 +21,7 @@ import Task1_functions as fn
 
 image_path = Path(__file__).resolve().parent / "Fruits.jpg"
 
-# Settings
+# %% Settings
 mirror = False
 window_size = 5
 ratio = 0.50
@@ -39,6 +36,7 @@ os.makedirs(output_folder, exist_ok=True)
 # Read original image once
 original_image = plt.imread(image_path)
 
+# %% Brightness loop
 # Dark factors: 1.00, 0.95, ..., 0.10
 for step in range(20, 1, -1):
     darkFactor = step / 20
@@ -49,6 +47,7 @@ for step in range(20, 1, -1):
     if mirror:
         image_fruits = fn.mirror_image(image_fruits)
 
+    # %% Apple filtering
     # Stage 1: colour filter
     mask, _ = fn.fruit_color_filter("apple", image_fruits)
 
@@ -60,7 +59,7 @@ for step in range(20, 1, -1):
     # Stage 3: largest connected region
     largest_mask = fn.keep_largest_region(clean_mask)
 
-    # Plot all stages
+    # %% Stage comparison
     fig, axes = plt.subplots(
         2, 2,
         figsize=(14, 10),
@@ -116,7 +115,7 @@ for step in range(20, 1, -1):
         fontsize=16
     )
 
-    # Save stage comparison
+    # %% Save image
     filename = (
         f"apple_stages_dark_{darkFactor:.2f}"
         f"_mirror_{mirror}.png"
