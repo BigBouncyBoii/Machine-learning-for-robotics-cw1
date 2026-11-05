@@ -22,7 +22,7 @@ DATA = HERE.parent / "data"                             # Part3/data
 LABELS = DATA / "labels.csv"
 SPLIT = DATA / "split.csv"
 VIDEO_DIR = DATA / "videos_480p"
-CACHE_DIR = HERE / "cache"                              # encoder outputs for all 160 clips (no labels), git-ignored
+CACHE_DIR = HERE / "cache"                              # encoder outputs for all 160 clips (no labels), committed so no video is needed
 RESULTS = HERE / "results"
 
 FINGERPRINT = "3696c80d"

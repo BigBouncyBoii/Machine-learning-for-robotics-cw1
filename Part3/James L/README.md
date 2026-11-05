@@ -26,7 +26,7 @@ Every number here is **mean leave-one-person-out validation accuracy on the 120 
 | `classifiers/mlp_ensemble.py` | The same 5 MLPs as one model, **probabilities averaged** (what `../FinalMethod.py` trains) |
 | `plots.py` | Validation bar chart (`main.py --figures`) |
 | `predict_clip.py` | Demo: classify any video file from the raw video. Not needed for any reported number |
-| `cache/` | Encoder outputs for all 160 clips (no labels). Git-ignored; built by the first run (~15 min CPU) |
+| `cache/` | Encoder outputs for all 160 clips (no labels). Committed (13 MB), so a fresh clone runs without the videos; rebuilt from the videos only if missing (~15 min CPU) |
 | `results/validation.csv` | One row per (feature set, classifier): accuracy per held-out person, mean, log loss, hard / soft, train accuracy |
 | `report.md` | Draft report text for this branch |
 | `archive/` | The old scripts (`explore.py`, `frames_node.py`, `extract_features.py`, `encoders/`). **Not submitted.** |

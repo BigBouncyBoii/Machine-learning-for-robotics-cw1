@@ -25,7 +25,6 @@ Thumbs.db
 # Part 3 recordings and cached features (too large; not submitted)
 Part3/data/videos/
 Part3/data/videos_480p/
-Part3/James L/cache/
 # Members' earlier code (not submitted, not in the tree)
 archive/
 *.mp4

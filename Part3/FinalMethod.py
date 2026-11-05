@@ -12,7 +12,7 @@
 # Uses James L's code (common.py, extractors/dinov2.py, classifiers/) and cached features (James L/cache/).
 # Run the default ONCE for the headline test number; the test clips must not be used to choose the method.
 #
-# HOW TO RUN (from any folder, venv activated; James L/cache/ is built by James L/main.py if missing)
+# HOW TO RUN (from any folder, venv activated; reads the committed James L/cache/, so no videos are needed)
 #   python Part3/FinalMethod.py                                   # final method: dinov2_middle + mlp_ensemble
 #   python Part3/FinalMethod.py --features videomae --classifier lr
 #   options: --features <any James L feature set>    --classifier lr | mlp_ensemble
