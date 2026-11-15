@@ -49,9 +49,9 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 # %% Load data
 df = pd.read_csv(os.path.join(HERE, "RegressionData.csv"))
-x, d = df["x"].values, df["d"].values          # x = inputs, d = desired outputs (41 each)
+x, d = df["x"].values, df["d"].values          # x = inputs, d = desired outputs: x (41,), d (41,)
 
-xtest = np.linspace(-0.97, 0.93, 20)           # 20 new x values, used only to plot the trained curve
+xtest = np.linspace(-0.97, 0.93, 20)           # (20,): 20 new x values, used only to plot the trained curve
 
 
 def reset_weights():
@@ -59,8 +59,8 @@ def reset_weights():
   # Both SGD and ADAM start from these same weights, so the comparison is fair.
   global W1, b1, W2, b2
   w = np.load(os.path.join(HERE, "InitialWeights.npz"))
-  W1, b1 = w["W1r"], w["b1r"]                  # input -> hidden: 3 weights, 3 biases
-  W2, b2 = w["W2r"], w["b2r"]                  # hidden -> output: 3 weights, 1 bias
+  W1, b1 = w["W1r"], w["b1r"]                  # input -> hidden: 3 weights, 3 biases. W1 (3x1), b1 (3x1)
+  W2, b2 = w["W2r"], w["b2r"]                  # hidden -> output: 3 weights, 1 bias. W2 (1x3), b2 (1x1)
 
 
 reset_weights()
@@ -68,17 +68,17 @@ reset_weights()
 # %% Forward pass
 def forward(xin):
   """xin: scalar or 1-D array of N inputs. Returns a1 (3,N) and y (1,N)."""
-  xin = np.reshape(xin, (1, -1))               # make x a row, so one x or many x both work
-  a1 = np.tanh(W1 @ xin + b1)                  # hidden layer: weighted sum n1, then tanh
-  y = W2 @ a1 + b2                             # output layer: weighted sum n2, no activation (y = n2)
+  xin = np.reshape(xin, (1, -1))               # (1xN): make x a row, so one x or many x both work
+  a1 = np.tanh(W1 @ xin + b1)                  # (3xN): hidden layer: weighted sum n1, then tanh (b1 broadcast over N)
+  y = W2 @ a1 + b2                             # (1xN): output layer: weighted sum n2, no activation (y = n2)
   return a1, y                                 # a1 is kept because backprop needs it
 
 
 def training_error():
   """Mean of (d - y)^2 over all 41 training samples."""
   # Mean squared error: average of (target - output)^2. Lower is better.
-  _, y = forward(x)
-  return np.mean((d - y.ravel()) ** 2)
+  _, y = forward(x)                    # y (1x41)
+  return np.mean((d - y.ravel()) ** 2)  # y.ravel() (41,), same as d; result is a scalar
 
 
 # %% Deltas
@@ -89,15 +89,15 @@ def deltas(di, a1, y):
   """Return delta1 (3,1) for the hidden nodes and delta2 (1,1) for the output node."""
   # --- Output node ---
   # Error for one sample: E = ½(d - y)².  The ½ cancels the 2 when we differentiate.
-  dEdy = -(di - y)                 # dE/dy: how the error changes with the output
-  dydn2 = 1                        # output is linear (y = n2), so its slope is 1
-  delta2 = dEdy * dydn2            # output delta = (y - d)
+  dEdy = -(di - y)                 # (1x1): dE/dy, how the error changes with the output (di is a scalar)
+  dydn2 = 1                        # scalar: output is linear (y = n2), so its slope is 1
+  delta2 = dEdy * dydn2            # (1x1): output delta = (y - d)
 
   # --- Hidden nodes ---
   # Chain rule: delta1 = delta2 x (weight from this hidden node to output) x (tanh slope)
-  dn2da1 = W2.T                    # each hidden node affects the output through its weight W2
-  da1dn1 = 1 - a1**2               # slope of tanh is 1 - tanh², and tanh(n1) is just a1
-  delta1 = delta2 * dn2da1 * da1dn1   # one delta for each of the 3 hidden nodes
+  dn2da1 = W2.T                    # (3x1): each hidden node affects the output through its weight W2
+  da1dn1 = 1 - a1**2               # (3x1): slope of tanh is 1 - tanh², and tanh(n1) is just a1
+  delta1 = delta2 * dn2da1 * da1dn1   # (3x1): one delta for each of the 3 hidden nodes
   return delta1, delta2
 
 
@@ -107,14 +107,14 @@ def gradients(xi, di, a1, y):
   # Rule: gradient of a weight = (delta of the node it goes into) x (the value coming into it)
 
   # Hidden -> output weights: the value coming in is the hidden output a1
-  dn2dw2 = a1.T
-  dEdw2 = delta2 * dn2dw2
-  dEdb2 = delta2                 # a bias is like a weight whose input is always 1
+  dn2dw2 = a1.T                  # (1x3)
+  dEdw2 = delta2 * dn2dw2        # (1x1)*(1x3) = (1x3), same as W2
+  dEdb2 = delta2                 # (1x1), same as b2: a bias is like a weight whose input is always 1
 
   # Input -> hidden weights: the value coming in is the input x
-  dn1dw1 = xi
-  dEdw1 = delta1 * dn1dw1
-  dEdb1 = delta1                 # again, bias input is 1
+  dn1dw1 = xi                    # scalar (one input value)
+  dEdw1 = delta1 * dn1dw1        # (3x1)*scalar = (3x1), same as W1
+  dEdb1 = delta1                 # (3x1), same as b1: again, bias input is 1
   return dEdw1, dEdb1, dEdw2, dEdb2
 
 
@@ -136,12 +136,12 @@ def train_sgd():
   """Train from the given weights with SGD. Returns the training error after each epoch."""
   reset_weights()                # start from the given weights
   np.random.seed(SEED)           # same shuffle order every time we run
-  err = np.zeros(N_EPOCHS)       # stores the error after each epoch (for the learning curve)
+  err = np.zeros(N_EPOCHS)       # (3000,): stores the error after each epoch (for the learning curve)
   for epoch in range(N_EPOCHS):
     # "Stochastic": update after EVERY single sample, not after the whole dataset.
     # Shuffling each epoch stops the network learning the points in a fixed order.
-    for i in np.random.permutation(len(x)):
-      a1, y = forward(x[i])                      # 1. forward pass for this one point
+    for i in np.random.permutation(len(x)):    # permutation (41,): the 41 indices in random order
+      a1, y = forward(x[i])                      # 1. forward pass for this one point: a1 (3x1), y (1x1)
       update_sgd(x[i], d[i], a1, y)              # 2+3. backprop and update the weights
     err[epoch] = training_error()                # error on all 41 points after this epoch
   return err
@@ -156,17 +156,17 @@ def train_sgd():
 def update_adam(xi, di, a1, y, m, v, t):
   """One ADAM step. m and v are lists of 4 arrays (one per weight/bias), updated in place; t is the step count."""
   global W1, b1, W2, b2
-  grads = gradients(xi, di, a1, y)     # same gradients as SGD; only the update rule is different
-  params = [W1, b1, W2, b2]
+  grads = gradients(xi, di, a1, y)     # same gradients as SGD; only the update rule is different. (3x1),(3x1),(1x3),(1x1)
+  params = [W1, b1, W2, b2]            # (3x1), (3x1), (1x3), (1x1)
 
   for k in range(4):                   # do the same thing for W1, b1, W2 and b2
-    g = grads[k]
-    m[k] = BETA1 * m[k] + (1 - BETA1) * g          # update the average gradient
-    v[k] = BETA2 * v[k] + (1 - BETA2) * g**2       # update the average squared gradient
+    g = grads[k]                                   # same shape as params[k]
+    m[k] = BETA1 * m[k] + (1 - BETA1) * g          # same shape as params[k]: update the average gradient
+    v[k] = BETA2 * v[k] + (1 - BETA2) * g**2       # same shape as params[k]: update the average squared gradient
     # Bias correction: m and v start at 0, so early on they are too small.
     # Dividing by (1 - beta^t) fixes this. As t grows, this divisor goes to 1 and stops mattering.
-    m_hat = m[k] / (1 - BETA1**t)
-    v_hat = v[k] / (1 - BETA2**t)
+    m_hat = m[k] / (1 - BETA1**t)                  # same shape as params[k]
+    v_hat = v[k] / (1 - BETA2**t)                  # same shape as params[k]
     params[k] = params[k] - ALPHA * m_hat / (np.sqrt(v_hat) + EPS)   # the ADAM step
   W1, b1, W2, b2 = params
 
@@ -175,13 +175,13 @@ def train_adam():
   """Train from the given weights with ADAM. Returns the training error after each epoch."""
   reset_weights()                # same starting weights as SGD (fair comparison)
   np.random.seed(SEED)           # same shuffle order as SGD
-  m = [np.zeros_like(p) for p in (W1, b1, W2, b2)]   # m and v start at zero, one per weight array
+  m = [np.zeros_like(p) for p in (W1, b1, W2, b2)]   # m and v start at zero, one per weight array: (3x1), (3x1), (1x3), (1x1)
   v = [np.zeros_like(p) for p in (W1, b1, W2, b2)]
   t = 0                          # step counter, used in the bias correction
-  err = np.zeros(N_EPOCHS)
+  err = np.zeros(N_EPOCHS)       # (3000,)
   for epoch in range(N_EPOCHS):
-    for i in np.random.permutation(len(x)):      # shuffle every epoch, as in SGD
-      a1, y = forward(x[i])
+    for i in np.random.permutation(len(x)):      # shuffle every epoch, as in SGD, indices 0..40 in a new random order
+      a1, y = forward(x[i])                      # a1 (3x1), y (1x1)
       t += 1                                     # counts every update, and is never reset between epochs
       update_adam(x[i], d[i], a1, y, m, v, t)
     err[epoch] = training_error()
@@ -190,15 +190,15 @@ def train_adam():
 
 # %% Run
 err_sgd = train_sgd()
-_, y_test_sgd = forward(xtest)    # save the SGD curve now, because train_adam() resets the weights
+_, y_test_sgd = forward(xtest)    # (1x20): save the SGD curve now, because train_adam() resets the weights
 
 err_adam = train_adam()
-_, y_test_adam = forward(xtest)   # the ADAM curve
+_, y_test_adam = forward(xtest)   # (1x20): the ADAM curve
 
 # %% Plots
 def first_below(errors, target):
   """Return the first epoch where the error is below target (epochs counted from 1)."""
-  below = np.nonzero(errors < target)[0]
+  below = np.nonzero(errors < target)[0]   # 1-D array of epoch indices where the error is below target
   return f"epoch {below[0] + 1}" if below.size else "not reached"
 
 
@@ -221,7 +221,7 @@ plt.savefig(os.path.join(OUT_DIR, "Task2_fit.png"), dpi=150, bbox_inches="tight"
 # Figure 2: error vs epoch for both methods (shows how fast each one learns)
 # The log scale on the y-axis makes small errors visible.
 plt.figure()
-epochs = np.arange(1, N_EPOCHS + 1)
+epochs = np.arange(1, N_EPOCHS + 1)       # (3000,)
 plt.semilogy(epochs, err_sgd, label="SGD")
 plt.semilogy(epochs, err_adam, label="ADAM")
 plt.axhline(ERR_TARGET, color="grey", linestyle="--", label=f"{ERR_TARGET}")
